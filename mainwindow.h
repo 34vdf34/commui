@@ -131,6 +131,13 @@ private slots:
     void onVaultProcessFinished();
     void exitVaultOpenProcess();
     void exitVaultOpenProcessWithFail();
+    void on_camButton_clicked();
+    void on_imageFrameCloseButton_clicked();
+    void on_imageFrameTakePictureButton_clicked();
+    void on_imageFrameSendPicture_clicked();
+    void incomingImageChangeDetected();
+    void incomingImageVerifyChange();
+    void tearDownLocal();
 
 
 private:
@@ -139,6 +146,8 @@ private:
     QFileSystemWatcher * msgWatcher;
     QFileSystemWatcher * txKeyWatcher;
     QFileSystemWatcher * rxKeyWatcher;
+
+    QFileSystemWatcher * imageWatcher;
 
     /* System preferences */
     struct SPreferences
@@ -186,6 +195,10 @@ private:
         QString goSecureButton;
         QString terminateSecureButton;
         QString systemName;
+        QString pinEntryTitleVault;
+        QString pinEntryTitleVaultChecking;
+        QString pinEntryTitleAccessPin;
+        bool cameraButtonVisible;
     };
     uiStrings uiElement;
     void loadUserInterfacePreferences();
@@ -206,10 +219,77 @@ private:
     QString m_keyStatusString[NODECOUNT];
     QString m_peerLatencyValue[NODECOUNT];
 
-    QString s_goSecureButtonStyle_highlight;
-    QString s_goSecureButtonStyle_normal;
-    QString s_terminateButtonStyle_highlight;
-    QString s_terminateButtonStyle_normal;
+
+
+    /* Button Styles */
+    QString s_goSecureButtonStyle_highlight = "QPushButton#greenButton { \
+            background-color: transparent; \
+            border-style: outset; \
+            border-width: 4px; \
+            border-radius: 10px; \
+            border-color: green; \
+            color: lightgreen; \
+            font:  bold 30px; \
+            min-width: 5em; \
+            padding: 6px; \
+        } \
+        QPushButton#greenButton:pressed { \
+            background-color: rgb(0,224, 0); \
+            border-style: inset; \
+        }";
+
+    QString s_goSecureButtonStyle_normal = "QPushButton#greenButton { \
+            background-color: transparent; \
+            border-style: outset; \
+            border-width: 2px; \
+            border-radius: 10px; \
+            border-color: green; \
+            color: green; \
+            font:  bold 30px; \
+            min-width: 5em; \
+            padding: 6px; \
+        } \
+        QPushButton#greenButton:pressed { \
+            background-color: rgb(0,224, 0); \
+            border-style: inset; \
+        }";
+
+    QString s_terminateButtonStyle_highlight="QPushButton#redButton { \
+            background-color: transparent; \
+            border-style: outset; \
+            border-width: 4px; \
+            border-radius: 10px; \
+            border-color: green; \
+            color: lightgreen; \
+            font:  bold 30px; \
+            min-width: 5em; \
+            padding: 6px; \
+        } \
+        QPushButton#redButton:pressed { \
+            background-color: red; \
+            border-style: inset; \
+        }";
+
+
+    QString s_terminateButtonStyle_normal="QPushButton#redButton { \
+            background-color: transparent; \
+            border-style: outset; \
+            border-width: 2px; \
+            border-radius: 10px; \
+            border-color: green; \
+            color: green; \
+            font:  bold 30px; \
+            min-width: 5em; \
+            padding: 6px; \
+        } \
+        QPushButton#redButton:pressed { \
+            background-color: red; \
+            border-style: inset; \
+        }";
+
+
+
+
     int m_knownNetworkIndex;
     int m_startMode;
 
@@ -257,7 +337,60 @@ private:
         padding: 3px;";
     int m_finalCountdownValue=10;
     QProcess vaultOpenProcess;
+    int m_imageFileSize;
+    bool m_timerBlock=false;
+    QString m_otpStausNormalStyle = " \
+        QPushButton { \
+            background-color: transparent; \
+            border-style: outset; \
+            border-width: 2px; \
+            border-radius: 10px; \
+            border-color: green; \
+           color: green; \
+            font: bold 30px; \
+            min-width: 1em; \
+            padding: 6px; \
+        } \
+        QPushButton:pressed { \
+            background-color: rgb(0,224, 0); \
+            border-style: inset; \
+        }";
 
+    QString m_otpStatusHighlightStyle = " \
+        QPushButton { \
+            background-color: transparent; \
+            border-style: outset; \
+            border-width: 2px; \
+            border-radius: 10px; \
+            border-color: green; \
+           color: lightgreen; \
+            font: bold 30px; \
+            min-width: 1em; \
+            padding: 6px; \
+        } \
+        QPushButton:pressed { \
+            background-color: rgb(0,224, 0); \
+            border-style: inset; \
+        }";
+        QString m_powerButtonDialogStyle = " \
+            QLabel{width:450 px; font-size: 30px; color: lightgreen; background-color: rgb(0, 0, 0); } \
+            QMessageBox { background-color: rgb(0, 0, 0); border: 5px solid green; } \
+            QPushButton { \
+                background-color: transparent; \
+                border-style: outset; \
+                border-width: 2px; \
+                border-radius: 10px; \
+                border-color: green; \
+                color: green; \
+                font: bold 32px; \
+                min-width: 5em; \
+                min-height: 2em; \
+                padding: 6px; \
+            } \
+            QPushButton:pressed { \
+                background-color: rgb(0,224, 0); \
+                border-style: inset; \
+            }";
 
 
 };

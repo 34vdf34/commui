@@ -18,8 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
  *
-
-*/
+ */
 
 #include <QProcess>
 #include <QDebug>
@@ -34,6 +33,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <linux/input.h>
+#include <QLocale>
+#include <QMessageBox>
 
 #define NODECOUNT               6
 #define CONNPOINTCOUNT          3
@@ -47,6 +48,8 @@
 #define UI_ELEMENTS_INI_FILE    "/opt/tunnel/userinterface.ini"
 #define WG_CONFIGURATION_FILE   "/etc/systemd/network/wg0.netdev"
 #define WG_CONFIGURATION_FILE_S "/opt/tunnel/network-configurations/wg0.netdev"
+#define IMAGE_TRANSFERRED_FILE  "/tmp/ftp/incoming/image.png"
+#define CAMERA_PIC_FILE         "/tmp/image.png"
 #define BLACK_OUT_TIME          300000
 #define MESSAGE_RECEIVE_FIFO    "/tmp/message_fifo_out"
 #define INDICATE_ONLY           0
@@ -79,6 +82,15 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
     ui->contact5Selected->setVisible(0);
     ui->contact6Selected->setVisible(0);
     ui->countLabel->setVisible(0);
+    ui->imageFrame->setVisible(0);
+    ui->pinButton_pwr->setVisible(false);
+    ui->pwrButton->setVisible(false);
+
+    /* Load user provided logo if it's present */
+    QString logoGraphFile("/root/logo.png");
+    QFile fileCheck(logoGraphFile);
+    if ( fileCheck.exists() )
+        ui->logoLabel->setPixmap(QPixmap(logoGraphFile));
 
     if ( argumentValue == VAULT_MODE ) {
         m_startMode = VAULT_MODE;
@@ -88,9 +100,10 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
         writeBackLight("254");
         backLightOn = true;
         ui->codeFrame->setVisible(true);
+        ui->logoLabel->setVisible(true);
         ui->settingsFrame->setVisible(false);
         ui->codeValue->setText("");
-        ui->pinEntryTitle->setText("Enter vault PIN");
+        ui->pinEntryTitle->setText(uiElement.pinEntryTitleVault);
         // After PIN -> program should exit
     } else {
 
@@ -101,31 +114,30 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
         loadUserPreferences();
         loadUserInterfacePreferences();
 
-        // Watcher
+        /* Watcher */
         QFileSystemWatcher *watcher = new QFileSystemWatcher();
         watcher->addPath(TELEMETRY_FIFO_OUT);
         QObject::connect(watcher, SIGNAL(fileChanged(QString)), this, SLOT(fifoChanged(QString)));
 
-        // Init telemetry fifo & watcher
         fifoWrite("127.0.0.1,daemon_ping");
 
-        // Open incoming telemetry FIFO
+        /* Incoming telemetry FIFO */
         if(!fifoIn.open(QIODevice::ReadOnly | QIODevice::Unbuffered | QIODevice::Text)) {
             qDebug() << "TELEMETRY FIFO ERROR:" << fifoIn.errorString();
         }
 
-        /* Init message fifo & watcher*/
+        /* Message fifo & watcher*/
         fifoWrite(nodes.myNodeIp + ",message,init");
         QFileSystemWatcher *msgWatcher = new QFileSystemWatcher();
         msgWatcher->addPath(MESSAGE_RECEIVE_FIFO);
         QObject::connect(msgWatcher, SIGNAL(fileChanged(QString)), this, SLOT(msgFifoChanged(QString)));
 
-        /* Open incoming message FIFO */
+        /* Incoming message FIFO */
         if(!msgFifoIn.open(QIODevice::ReadOnly | QIODevice::Unbuffered | QIODevice::Text)) {
             qDebug() << "MSG FIFO ERROR:" << msgFifoIn.errorString();
         }
 
-        /* Set initial volume Volume  */
+        /* Initial volume */
         ui->volumeSlider->setValue(uPref.volumeValue.toInt());
         if ( uPref.volumeValue == "" ) {
             uPref.volumeValue = "50";
@@ -153,7 +165,7 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
         rampUp();
         backLightOn = true;
 
-        /* Enable only first route point for demo */
+        /* Enable route buttons */
         ui->route1Button->setEnabled(true);
         ui->route2Button->setEnabled(true);
         ui->route3Button->setEnabled(false);
@@ -161,7 +173,7 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
         /* Set connection state */
         g_connectState=false;
 
-        /* Set key presentage watchers TODO: improve this */
+        /* Key presentage watchers TODO: improve this */
         QFileSystemWatcher *txKeyWatcher = new QFileSystemWatcher();
         txKeyWatcher->addPath(TX_KEY_PRESENTAGE);
         QObject::connect(txKeyWatcher, SIGNAL(fileChanged(QString)), this, SLOT(txKeyPresentageChanged()));
@@ -173,7 +185,7 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
             stream << "wait" << Qt::endl;
         }
 
-        /* Open incoming txKey FIFO */
+        /* Incoming txKey FIFO */
         if(!txKeyFifoIn.open(QIODevice::ReadOnly | QIODevice::Unbuffered | QIODevice::Text)) {
             qDebug() << "txKey FIFO error:" << txKeyFifoIn.errorString();
         }
@@ -189,7 +201,7 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
             stream << "wait" << Qt::endl;
         }
 
-        /* Open incoming rxKey FIFO */
+        /* Incoming rxKey FIFO */
         if(!rxKeyFifoIn.open(QIODevice::ReadOnly | QIODevice::Unbuffered | QIODevice::Text)) {
             qDebug() << "rxKey FIFO error:" << rxKeyFifoIn.errorString();
         }
@@ -199,78 +211,16 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
         connect(envTimer, SIGNAL(timeout()), this, SLOT(networkLatency()) );
         envTimer->start(5000);
 
-        /* Button Styles */
-        s_goSecureButtonStyle_highlight = "QPushButton#greenButton { \
-                background-color: transparent; \
-                border-style: outset; \
-                border-width: 4px; \
-                border-radius: 10px; \
-                border-color: green; \
-                color: lightgreen; \
-                font:  bold 30px; \
-                min-width: 5em; \
-                padding: 6px; \
-            } \
-            QPushButton#greenButton:pressed { \
-                background-color: rgb(0,224, 0); \
-                border-style: inset; \
-            }";
-
-        s_goSecureButtonStyle_normal = "QPushButton#greenButton { \
-                background-color: transparent; \
-                border-style: outset; \
-                border-width: 2px; \
-                border-radius: 10px; \
-                border-color: green; \
-                color: green; \
-                font:  bold 30px; \
-                min-width: 5em; \
-                padding: 6px; \
-            } \
-            QPushButton#greenButton:pressed { \
-                background-color: rgb(0,224, 0); \
-                border-style: inset; \
-            }";
-
-        s_terminateButtonStyle_highlight="QPushButton#redButton { \
-                background-color: transparent; \
-                border-style: outset; \
-                border-width: 4px; \
-                border-radius: 10px; \
-                border-color: green; \
-                color: lightgreen; \
-                font:  bold 30px; \
-                min-width: 5em; \
-                padding: 6px; \
-            } \
-            QPushButton#redButton:pressed { \
-                background-color: red; \
-                border-style: inset; \
-            }";
-
-
-        s_terminateButtonStyle_normal="QPushButton#redButton { \
-                background-color: transparent; \
-                border-style: outset; \
-                border-width: 2px; \
-                border-radius: 10px; \
-                border-color: green; \
-                color: green; \
-                font:  bold 30px; \
-                min-width: 5em; \
-                padding: 6px; \
-            } \
-            QPushButton#redButton:pressed { \
-                background-color: red; \
-                border-style: inset; \
-            }";
-
-        // Disable "Go Secure"
+        /* Disable "Go Secure" */
         ui->greenButton->setEnabled(false);
+
+        /* Set filesystem watcher for Camera (experimental) */
+        QFileSystemWatcher *imageWatcher = new QFileSystemWatcher();
+        imageWatcher->addPath("/tmp/ftp/incoming/image.png");
+        QObject::connect(imageWatcher, SIGNAL(fileChanged(QString)), this, SLOT(incomingImageChangeDetected()));
+
     }
 }
-
-
 
 void MainWindow::txKeyPresentageChanged()
 {
@@ -302,81 +252,45 @@ void MainWindow::readGpioButtons()
         perror("read error");
         exit(-1);
     }
-    QString normalStyle = " \
-        QPushButton { \
-            background-color: transparent; \
-            border-style: outset; \
-            border-width: 2px; \
-            border-radius: 10px; \
-            border-color: green; \
-           color: green; \
-            font: bold 30px; \
-            min-width: 1em; \
-            padding: 6px; \
-        } \
-        QPushButton:pressed { \
-            background-color: rgb(0,224, 0); \
-            border-style: inset; \
-        }";
-
-    QString highlightStyle = " \
-        QPushButton { \
-            background-color: transparent; \
-            border-style: outset; \
-            border-width: 2px; \
-            border-radius: 10px; \
-            border-color: green; \
-           color: lightgreen; \
-            font: bold 30px; \
-            min-width: 1em; \
-            padding: 6px; \
-        } \
-        QPushButton:pressed { \
-            background-color: rgb(0,224, 0); \
-            border-style: inset; \
-        }";
 
     switch (in_ev.type) {
         case EV_KEY:
         {
-            // F1 key is OTP status display
+            /* F1 key: OTP status display */
             if (KEY_A == in_ev.code && in_ev.value == 1 ) {
                 ui->lineEdit->clearFocus();
-                /* Read key status */
                 reloadKeyUsage();
-                /* Change button titles */
                 ui->contact1Button->setText( m_keyStatusString[0] );
                 ui->contact2Button->setText( m_keyStatusString[1] );
                 ui->contact3Button->setText( m_keyStatusString[2] );
                 ui->contact4Button->setText( m_keyStatusString[3] );
                 ui->contact5Button->setText( m_keyStatusString[4] );
                 ui->contact6Button->setText( m_keyStatusString[5] );
-                ui->contact1Button->setStyleSheet(highlightStyle);
-                ui->contact2Button->setStyleSheet(highlightStyle);
-                ui->contact3Button->setStyleSheet(highlightStyle);
-                ui->contact4Button->setStyleSheet(highlightStyle);
-                ui->contact5Button->setStyleSheet(highlightStyle);
-                ui->contact6Button->setStyleSheet(highlightStyle);
+                ui->contact1Button->setStyleSheet(m_otpStatusHighlightStyle);
+                ui->contact2Button->setStyleSheet(m_otpStatusHighlightStyle);
+                ui->contact3Button->setStyleSheet(m_otpStatusHighlightStyle);
+                ui->contact4Button->setStyleSheet(m_otpStatusHighlightStyle);
+                ui->contact5Button->setStyleSheet(m_otpStatusHighlightStyle);
+                ui->contact6Button->setStyleSheet(m_otpStatusHighlightStyle);
                 break;
             }
             if (KEY_A == in_ev.code && in_ev.value == 0 ) {
                 ui->lineEdit->setFocus();
-                /* Change button titles */
                 ui->contact1Button->setText( nodes.node_name[0] );
                 ui->contact2Button->setText( nodes.node_name[1] );
                 ui->contact3Button->setText( nodes.node_name[2] );
                 ui->contact4Button->setText( nodes.node_name[3] );
                 ui->contact5Button->setText( nodes.node_name[4] );
                 ui->contact6Button->setText( nodes.node_name[5] );
-                ui->contact1Button->setStyleSheet(normalStyle);
-                ui->contact2Button->setStyleSheet(normalStyle);
-                ui->contact3Button->setStyleSheet(normalStyle);
-                ui->contact4Button->setStyleSheet(normalStyle);
-                ui->contact5Button->setStyleSheet(normalStyle);
-                ui->contact6Button->setStyleSheet(normalStyle);
+                ui->contact1Button->setStyleSheet(m_otpStausNormalStyle);
+                ui->contact2Button->setStyleSheet(m_otpStausNormalStyle);
+                ui->contact3Button->setStyleSheet(m_otpStausNormalStyle);
+                ui->contact4Button->setStyleSheet(m_otpStausNormalStyle);
+                ui->contact5Button->setStyleSheet(m_otpStausNormalStyle);
+                ui->contact6Button->setStyleSheet(m_otpStausNormalStyle);
                 break;
             }
-            /* F2 key is beep mute/unmute */
+            /* F2 key: beep mute */
             if ( KEY_S == in_ev.code && in_ev.value == 1 ) {
                 ui->lineEdit->clearFocus();
                 if ( nodes.beepActive == "1") {
@@ -391,10 +305,10 @@ void MainWindow::readGpioButtons()
                     ui->lineEdit->setFocus();
                 }
             }
-
-            /* F3 key is 'nuke.sh' */
+            /* F3 key: 'nuke.sh' */
             if (KEY_D == in_ev.code && in_ev.value == 1 ) {
                 ui->lineEdit->clearFocus();
+                on_eraseButton_clicked();
                 /* Override beep */
                 nodes.beepActive = "1";
                 ui->countLabel->setVisible(true);
@@ -412,8 +326,7 @@ void MainWindow::readGpioButtons()
                 ui->countLabel->setVisible(false);
                 beepBuzzerOff();
             }
-
-            /* Green button is screen lock/unlock  */
+            /* Green button: screen lock/unlock  */
             if (KEY_F == in_ev.code && in_ev.value == 1 && backLightOn == false ) {
                 ui->lineEdit->clearFocus();
                 screenBlanktimer->start(BLACK_OUT_TIME);
@@ -428,9 +341,22 @@ void MainWindow::readGpioButtons()
                 break;
             }
 
-            /* PWR Button (TODO) */
+            /* Power button dialog */
             if (142 == in_ev.code && in_ev.value == 1 ) {
-                qDebug() << "PWR Button";
+                if ( backLightOn == false ) {
+                    rampUp();
+                }
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Power button");
+                msgBox.setText("Do you want to power off?");
+                msgBox.setStandardButtons(QMessageBox::Yes);
+                msgBox.addButton(QMessageBox::No);
+                msgBox.setDefaultButton(QMessageBox::No);
+                msgBox.setStyleSheet( m_powerButtonDialogStyle );
+                if(msgBox.exec() == QMessageBox::Yes){
+                  on_pwrButton_clicked();
+                } else {
+                }
                 break;
             }
         }
@@ -467,7 +393,7 @@ void MainWindow::rampUp()
     backLightOn=true;
     for (int x=0; x<255; x++) {
         writeBackLight(QString::number(x));
-        /* Some QT experts might do this better? */
+        /* TODO: Improve this */
         QCoreApplication::processEvents();
     }
     if ( !screenBlanktimer->isActive()) {
@@ -484,9 +410,13 @@ void MainWindow::rampDown()
     }
     writeBackLight("0");
     screenBlanktimer->stop();
+    ui->pinEntryTitle->setText(uiElement.pinEntryTitleAccessPin);
     ui->codeFrame->setVisible(true);
+    ui->logoLabel->setVisible(true);
     ui->settingsFrame->setVisible(false);
     ui->codeValue->setText("");
+    ui->imageFramePictureLabel->clear();
+    ui->imageFrame->setVisible(0);
 }
 
 void MainWindow::writeBackLight(QString value)
@@ -501,7 +431,7 @@ void MainWindow::writeBackLight(QString value)
 
 void MainWindow::fifoWrite(QString message)
 {
-    // Dummy read
+    /* Dummy read */
     QTextStream in(&fifoIn);
     QString line = in.readAll();
     g_fifoReply = "";
@@ -598,15 +528,13 @@ void MainWindow::fifoChanged(const QString & path)
 
       if( token[1].compare("terminate_ready") == 0 )
       {
-          updateCallStatusIndicator("OTP disconnected", "green", "transparent",INDICATE_ONLY );
-          // Erase green status
+          updateCallStatusIndicator("remote terminated", "green", "transparent",INDICATE_ONLY );
           ui->contact1Selected->setVisible(0);
           ui->contact2Selected->setVisible(0);
           ui->contact3Selected->setVisible(0);
           ui->contact4Selected->setVisible(0);
           ui->contact5Selected->setVisible(0);
           ui->contact6Selected->setVisible(0);
-          // Activate 'contacts' again
           setContactButtons(true);
           ui->answerButton->setEnabled(true);
           ui->answerButton->setVisible(true);
@@ -614,6 +542,7 @@ void MainWindow::fifoChanged(const QString & path)
           ui->redButton->setStyleSheet(s_terminateButtonStyle_normal);
           ui->greenButton->setStyleSheet(s_goSecureButtonStyle_normal);
           ui->greenButton->setEnabled(false);
+          on_eraseButton_clicked();
       }
 
       if( token[1].compare("busy") == 0 )
@@ -625,7 +554,7 @@ void MainWindow::fifoChanged(const QString & path)
           updateCallStatusIndicator("Remote offline", "green", "transparent",LOG_ONLY );
       }
   }
-    /* Other status codes (TODO):
+    /* TODO: Other status codes
         busy
         terminate_ready
         prepare_ready
@@ -642,7 +571,6 @@ int MainWindow::msgFifoChanged(const QString & path)
     QTextStream in(&msgFifoIn);
     QString line = in.readAll();
     QStringList token = line.split(',');
-
     /* Logic for UI ring indication. Note that ring tone ('sound') is played by telemetry logic */
     if ( token[1] == "ring" )
     {
@@ -657,14 +585,11 @@ int MainWindow::msgFifoChanged(const QString & path)
         token[1]="";
     }
 
-    /* TODO: Is this obsolete ??!! */
+    /* TODO: Is this obsolete ? */
     if ( token[1] == "answered_ok") {
-        // THIS "audio active" frame needs to be adjusted still
-        // ui->messagesView->append("[SYSTEM]: Remote answered (" + token[0] + ")");
         updateCallStatusIndicator("Accepted ("+token[0]+")", "lightgreen", "transparent",LOG_AND_INDICATE);
         ui->incomingTitleFrame->setText("Voice active");
         ui->inComingFrame->setVisible(true);
-        // ui->greenButton->setEnabled(false);
         token[1]="";
     }
 
@@ -674,18 +599,26 @@ int MainWindow::msgFifoChanged(const QString & path)
         updateCallStatusIndicator("Remote hangup", "green", "transparent",LOG_AND_INDICATE);
         token[1]="";
         ui->redButton->click();
+        on_eraseButton_clicked();
     }
     if ( token[1] == "answer_success") {
         updateCallStatusIndicator("Audio active", "lightgreen", "transparent",INDICATE_ONLY);
         token[1]="";
     }
-    // Remote (who connected us) presses 'terminate', we should do the same
+    /* Remote (who connected us) presses 'terminate', we should do the same.
+       TODO: This has some logic errors.
+     */
     if ( token[1] == "initiator_disconnect") {
+        qDebug() << "initiator_disconnect()";
         ui->inComingFrame->setVisible(false);
-        ui->redButton->click();
+        // ui->redButton->click(); // WRONG!! We cannot 'disconnect' as Client if we are 'Server'
+        if ( g_connectState )
+            on_denyButton_clicked();
         token[1]="";
+        on_eraseButton_clicked();
     }
-    // client_connected,[client_id];[client_ip];[client_name]
+
+    /* client_connected,[client_id];[client_ip];[client_name] */
     if ( token[1].contains( "client_connected",Qt::CaseInsensitive ) ) {
         QStringList remoteParameters = token[1].split(';');
         g_connectedNodeId = remoteParameters[1];
@@ -694,28 +627,26 @@ int MainWindow::msgFifoChanged(const QString & path)
         updateCallStatusIndicator(remoteParameters[3] + " connected" , "lightgreen","transparent",LOG_AND_INDICATE);
         token[1]="";
         setIndicatorForIncomingConnection(remoteParameters[2]);
-        // If screen is blank, unblank it
         if (  backLightOn == false ) {
             rampUp();
         }
-        // Inbound OTP
+        /* Inbound OTP */
         g_remoteOtpPeerIp = "10.10.0.2";
-        // Inbound connection: highlight terminate and disable Go Secure (TODO)
+        /* Inbound connection: highlight terminate and disable Go Secure */
         ui->redButton->setStyleSheet(s_terminateButtonStyle_highlight);
         ui->greenButton->setStyleSheet(s_goSecureButtonStyle_normal);
         ui->greenButton->setEnabled(false);
         beepBuzzer(10);
     }
 
-    /* ping - pong commcheck */
+    /* Commcheck TODO: Make alive ping out of this */
     if ( token[1] == "Ping") {
         if ( g_connectState ) {
-            QString fifo_command = g_remoteOtpPeerIp + ",message,Pong";
+            QString fifo_command = g_remoteOtpPeerIp + ",message,Commcheck from: " + nodes.myNodeName;
             fifoWrite(fifo_command);
             return 0;
         }
     }
-
     /* Normal message to be shown */
     if (token[1] != "" )
     {        
@@ -735,7 +666,7 @@ void MainWindow::setContactButtons(bool state)
     ui->contact4Button->setDisabled(!state);
     ui->contact5Button->setDisabled(!state);
     ui->contact6Button->setDisabled(!state);
-    /* If button's are enabled, disable 'own' button still */
+    /* If button's are enabled, disable 'own' button */
     int myOwnNodeId;
     for (int x=0; x < NODECOUNT; x++ ) {
         if ( nodes.node_name[x].compare( nodes.myNodeName ) == 0 )
@@ -766,9 +697,9 @@ void MainWindow::setIndicatorForIncomingConnection(QString peerIp)
         ui->contact4Selected->setVisible(0);
         ui->contact5Selected->setVisible(0);
         ui->contact6Selected->setVisible(0);
-        // Disable contact buttons when incoming connection is alive
+        /* Disable contact buttons when incoming connection is alive */
         setContactButtons(false);
-        // Light up 'green' for contact, who made connection
+        /* Light up 'green' for contact, who made connection */
         int nodeNumber;
         for (int x=0; x<NODECOUNT; x++) {
           if(peerIp.compare(nodes.node_ip[x]) == 0) {
@@ -814,7 +745,7 @@ void MainWindow::loadSettings()
 {
     int myOwnNodeId;
     QSettings settings(SETTINGS_INI_FILE,QSettings::IniFormat);
-    /* Get own node information*/
+    /* Get own node information */
     nodes.myNodeId = settings.value("my_id").toString();
     nodes.myNodeIp = settings.value("my_ip").toString();
     nodes.myNodeName = settings.value("my_name").toString();
@@ -854,10 +785,8 @@ void MainWindow::loadSettings()
                  ui->contact6Button->setDisabled(true);
          }
     }
-
     /* Get connection profile from INI file */
     loadConnectionProfile();
-
     /* Get connection points */
     for (int x=0; x < CONNPOINTCOUNT; x++ ) {
         nodes.connectionPointName[x] = settings.value("conn_point_name_"+QString::number(x), "").toString();
@@ -865,7 +794,6 @@ void MainWindow::loadSettings()
         ui->route2Button->setText(nodes.connectionPointName[1]);
         ui->route3Button->setText(nodes.connectionPointName[2]);
     }
-
     /* Get connection gateway IP and PORT to settings page */
     QSettings connectionSettings(WG_CONFIGURATION_FILE,QSettings::IniFormat);
     QString connectionIp = connectionSettings.value("WireGuardPeer/Endpoint").toString();
@@ -900,8 +828,7 @@ void MainWindow::saveAndActivateConnectionProfile(QString profile)
         QSettings settings(SETTINGS_INI_FILE,QSettings::IniFormat);
         settings.setValue("connection_profile", profile );
     }
-
-    // RUN Profile change (includes reboot)
+    /* Run Profile change (includes reboot) */
     if ( profile == "wan" )
     {
         qint64 pid;
@@ -927,7 +854,8 @@ void MainWindow::saveAndActivateConnectionProfile(QString profile)
 /* Set system volume with external process */
 void MainWindow::setSystemVolume(int volume)
 {
-    /*  USB HF: amixer sset Headset 100
+    /* TODO: Device naming
+     * USB HF: amixer sset Headset 100
                 amixer sset Headset Capture 5%+
     */
 
@@ -983,12 +911,23 @@ void MainWindow::loadUserInterfacePreferences()
     uiElement.goSecureButton = settings.value("go_secure_button","Go Secure").toString();
     uiElement.terminateSecureButton = settings.value("terminate_secure_button","Terminate").toString();
     uiElement.systemName = settings.value("system_name","CommUnit").toString();
+    uiElement.pinEntryTitleVault = settings.value("pintitle_vault","Enter vault PIN").toString();
+    uiElement.pinEntryTitleVaultChecking = settings.value("pintitle_vault_check","Checking...").toString();
+    uiElement.pinEntryTitleAccessPin = settings.value("pintitle_access","Set calibration data:").toString();
+    uiElement.cameraButtonVisible = settings.value("cam_enabled",false).toBool();
     ui->systemNameLabel->setText(uiElement.systemName);
     ui->messagingTitle->setText(uiElement.messagingTitle);
     ui->commCheckButton->setText(uiElement.commCheckButton);
     ui->eraseButton->setText(uiElement.eraseButton);
     ui->greenButton->setText(uiElement.goSecureButton);
     ui->redButton->setText(uiElement.terminateSecureButton);
+    ui->pinEntryTitle->setText(uiElement.pinEntryTitleAccessPin);
+
+    if ( uiElement.cameraButtonVisible ) {
+        ui->camButton->setVisible(1);
+    } else {
+        ui->camButton->setVisible(0);
+    }
 }
 
 /* 'Go Secure' button */
@@ -996,13 +935,13 @@ void MainWindow::on_greenButton_clicked()
 {
     screenBlanktimer->start(BLACK_OUT_TIME);
     updateCallStatusIndicator("Waiting remote", "lightgreen","transparent",INDICATE_ONLY);
-    // This is shell script ring -> ring_ready
+    /* Send telemetry 'ring' -> ring_ready */
     QString callString = g_connectedNodeIp + ",ring";
     fifoWrite( callString );
     while ( g_fifoReply == "" ) {
         QCoreApplication::processEvents();
     }
-    // Ring also on UI
+    /* Send 'ring' to UI */
     callString = g_connectedNodeIp + ",message,ring";
     fifoWrite( callString );
 }
@@ -1011,17 +950,24 @@ void MainWindow::on_greenButton_clicked()
 void MainWindow::on_redButton_clicked()
 {
     screenBlanktimer->start(BLACK_OUT_TIME);
+
+    updateCallStatusIndicator("Terminating...", "lightgreen", "transparent",INDICATE_ONLY );
+
     ui->contact1Selected->setVisible(0);
     ui->contact2Selected->setVisible(0);
     ui->contact3Selected->setVisible(0);
     ui->contact4Selected->setVisible(0);
     ui->contact5Selected->setVisible(0);
     ui->contact6Selected->setVisible(0);
-    setContactButtons(true);
+    // setContactButtons(true);
+
     if ( g_connectState )
         disconnectAsClient(g_connectedNodeIp, g_connectedNodeId);
 
-    updateCallStatusIndicator(uiElement.secureVoiceInactiveNotify, "green", "transparent",LOG_AND_INDICATE);
+    /* Local FIFO commands don't have ACK */
+    QTimer::singleShot(6 * 1000, this, SLOT(tearDownLocal()));
+
+    updateCallStatusIndicator("Please wait...", "lightgreen", "transparent",LOG_AND_INDICATE);
     ui->keyPrecentage->setText("");
     ui->redButton->setStyleSheet(s_terminateButtonStyle_normal);
     ui->greenButton->setStyleSheet(s_goSecureButtonStyle_normal);
@@ -1029,7 +975,16 @@ void MainWindow::on_redButton_clicked()
     if ( uPref.m_autoerase == "true") {
         on_eraseButton_clicked();
     }
-    beepBuzzer(100);
+    beepBuzzer(10);
+}
+
+void MainWindow::tearDownLocal()
+{
+    qDebug() << "tearDownLocal";
+    QString terminateLocalFifoCmd = "127.0.0.1,terminate_local";
+    fifoWrite(terminateLocalFifoCmd);
+    setContactButtons(true);
+    updateCallStatusIndicator(uiElement.secureVoiceInactiveNotify, "green", "transparent",LOG_AND_INDICATE);
 }
 
 void MainWindow::on_route1Button_clicked()
@@ -1127,9 +1082,11 @@ void MainWindow::on_lineEdit_returnPressed()
     screenBlanktimer->start(BLACK_OUT_TIME);
     if ( g_connectState ) {
         QString msg_line = ui->lineEdit->text();
+        /* TODO: Check lenght */
         ui->messagesView->append("<font color='white'>" + msg_line + "</font>");
         msg_line.replace( ",", QChar(SUBSTITUTE_CHAR_CODE) );
         QString fifo_command = g_remoteOtpPeerIp + ",message," + msg_line;
+        qDebug() << "on_lineEdit_returnPressed(): " << fifo_command;
         fifoWrite(fifo_command);
         ui->lineEdit->clear();
     }
@@ -1208,6 +1165,7 @@ int MainWindow::on_pinButton_c_clicked()
             ui->saveGatewayButton->setStyleSheet(m_buttonNormalStyle);
             ui->saveGatewayButton->setEnabled(false);
             ui->settingsFrame->setVisible(true);
+            ui->logoLabel->setVisible(false);
             return 0;
         }
         if ( ui->codeValue->text() == uPref.m_pinCode ) {
@@ -1220,10 +1178,9 @@ int MainWindow::on_pinButton_c_clicked()
             return 0;
         }
     } else {
-        /* We are in VAULT mode */
+        /* VAULT mode */
         QString vaultPinCode = ui->codeValue->text();
         if ( vaultPinCode.length() > 3 ) {
-
             vaultOpenProcess.connect(&vaultOpenProcess,
                     &QProcess::readyReadStandardOutput,
                     this, &MainWindow::onVaultProcessReadyReadStdOutput);
@@ -1231,7 +1188,7 @@ int MainWindow::on_pinButton_c_clicked()
                     (void (QProcess::*)(int,QProcess::ExitStatus))&QProcess::finished,
                     this, &MainWindow::onVaultProcessFinished);
 
-            ui->pinEntryTitle->setText("Checking...");
+            ui->pinEntryTitle->setText(uiElement.pinEntryTitleVaultChecking);
             ui->codeValue->setText("");
             vaultOpenProcess.setProgram("/bin/vault-pin.sh");
             vaultOpenProcess.setArguments({vaultPinCode});
@@ -1265,7 +1222,7 @@ void MainWindow::exitVaultOpenProcessWithFail()
 {
     ui->countLabel->setVisible(false);
     ui->countLabel->setText("");
-    ui->pinEntryTitle->setText("Enter vault PIN");
+    ui->pinEntryTitle->setText(uiElement.pinEntryTitleVault);
     ui->codeValue->setText("");
 }
 void MainWindow::onVaultProcessFinished()
@@ -1314,19 +1271,16 @@ void MainWindow::updateCallStatusIndicator(QString text, QString fontColor, QStr
 void MainWindow::connectAsClient(QString nodeIp, QString nodeId)
 {
     screenBlanktimer->start(BLACK_OUT_TIME);
-
-    // 1. Send 'prepare' to recipient via FIFO
+    /* 1. Send 'prepare' to recipient via FIFO */
     QString prepareFifoCmd = nodeIp + ",prepare";
     fifoWrite(prepareFifoCmd);
 
-        // TODO: THIS NEEDS TO BE REWORKED !!
-        // TODO: We could compare 'prepare' -> 'prepare_ready' and continue only then
+        /* TODO: THIS NEEDS TO BE REWORKED */
         while ( g_fifoReply == "" ) {
             QCoreApplication::processEvents();
         }
 
-
-    // 2. Start local service for targeted node as client
+    /* 2. Start local service for targeted node as client */
     QString serviceNameAsClient = "connect-with-"+nodeId+"-c.service";
     qDebug() << "Starting service: " << serviceNameAsClient;
     qint64 pid;
@@ -1335,34 +1289,33 @@ void MainWindow::connectAsClient(QString nodeIp, QString nodeId)
     process.setArguments({"start",serviceNameAsClient});
     process.startDetached(&pid);
 
-    // 3. Touch local file
+    /* 3. Touch local file */
     touchLocalFile("/tmp/CLIENT_CALL_ACTIVE");
 
-    // Now we should have OTP connectivity ready
+    /* Now we should have OTP connectivity ready */
     g_connectState = true;
     g_connectedNodeId = nodeId;
     g_connectedNodeIp = nodeIp;
 
-    // 4. Indicate yellow state on status
+    /* 4. Indicate yellow state on status */
     updateCallStatusIndicator("OTP connected", "lightgreen", "transparent",INDICATE_ONLY);
 
-    // We should highlight Go Secure and Terminate at initiator end (TODO)
+    /* We should highlight Go Secure and Terminate at initiator end (TODO) */
     ui->redButton->setStyleSheet(s_terminateButtonStyle_highlight);
     ui->greenButton->setStyleSheet(s_goSecureButtonStyle_highlight);
     ui->greenButton->setEnabled(true);
 
-    // 4.5 We should disable Peer keys when connected
+    /* We should disable Peer keys when connected */
     setContactButtons(false);
 
-    // 5. Set fixed remote IP based on client role of connection
+    /* 5. Set fixed remote IP based on client role of connection */
     g_remoteOtpPeerIp = "10.10.0.1";
 
-    // 6. Indicate remote peer UI that we're connected WORK IN PROGRESS!!
+    /* 6. Indicate remote peer UI that we're connected WORK IN PROGRESS!! */
     QString informRemoteUi = nodeIp + ",message,client_connected;"+nodes.myNodeId+";"+nodes.myNodeIp+";"+nodes.myNodeName;
     fifoWrite(informRemoteUi);
 
-    // TODO: THIS NEEDS TO BE REWORKED !!
-    // Debug try, needs timeout at least => prepare_ready
+    /*  TODO: THIS NEEDS TO BE REWORKED !! */
     while ( g_fifoReply == "" ) {
         QCoreApplication::processEvents();
     }
@@ -1373,26 +1326,26 @@ void MainWindow::connectAsClient(QString nodeIp, QString nodeId)
 void MainWindow::disconnectAsClient(QString nodeIp, QString nodeId)
 {
     screenBlanktimer->start(BLACK_OUT_TIME);
-    // 1. Terminate to FIFO
+    /* 1. Terminate to FIFO */
     QString terminateFifoCmd = nodeIp + ",terminate";
     fifoWrite(terminateFifoCmd);
 
-    // TODO: THIS NEEDS TO BE REWORKED !!
-    // Let's wait for reply
+    /*  TODO: THIS NEEDS TO BE REWORKED !! */
     while ( g_fifoReply == "" ) {
         QCoreApplication::processEvents();
     }
-    // 2. Terminate to UI (so remote can tear down indications)
+    /* 2. Terminate to UI (so remote can tear down indications) */
     terminateFifoCmd = nodeIp + ",message,initiator_disconnect";
     fifoWrite(terminateFifoCmd);
 
-    // TODO: THIS NEEDS TO BE REWORKED !!
-    // Let's wait for reply
+    /*  TODO: THIS NEEDS TO BE REWORKED !!
+        Let's wait for reply
+    */
     while ( g_fifoReply == "" ) {
         QCoreApplication::processEvents();
     }
 
-    // 2. Stop local service for targeted node (as client)
+    /* 2. Stop local service for targeted node (as client) */
     QString serviceNameAsClient = "connect-with-"+nodeId+"-c.service";
     qint64 pid;
     QProcess process;
@@ -1400,11 +1353,12 @@ void MainWindow::disconnectAsClient(QString nodeIp, QString nodeId)
     process.setArguments({"stop",serviceNameAsClient});
     process.startDetached(&pid);
 
-    // 3. Remove local status file
+    /* 3. Remove local status file */
     removeLocalFile("/tmp/CLIENT_CALL_ACTIVE");
 
-    // 4. Terminate Audio
-    // 'telemetryclient' knows how to terminate audio, based on how it's established (client or server)
+    /*  4. Terminate Audio
+        'telemetryclient' knows how to terminate audio, based on how it's established (client or server)
+    */
     QString terminateAudioFifoCmd = "127.0.0.1,disconnect_audio";
     fifoWrite(terminateAudioFifoCmd);
     g_connectState = false;
@@ -1412,11 +1366,11 @@ void MainWindow::disconnectAsClient(QString nodeIp, QString nodeId)
     g_connectedNodeIp = "";
     g_remoteOtpPeerIp = "";
 
-    // Erase msg history
+    /* Erase msg history */
     if ( uPref.m_autoerase == "true") {
         on_eraseButton_clicked();
     }
-    on_redButton_clicked();
+    // on_redButton_clicked(); 18thNov
 }
 
 void MainWindow::touchLocalFile(QString filename)
@@ -1437,21 +1391,21 @@ void MainWindow::on_answerButton_clicked()
     screenBlanktimer->start(BLACK_OUT_TIME);
     updateCallStatusIndicator("Accepted", "green","transparent",LOG_AND_INDICATE);
 
-    // Send indication that we answered succesfully (TEST) WORK IN PROGRESS
+    /* Send indication that we answered succesfully */
     QString answerString = g_connectedNodeIp + ",message,answer_success";
     fifoWrite( answerString );
     while ( g_fifoReply == "" ) {
         QCoreApplication::processEvents();
     }
 
-    // Send answer to telemetry server
+    /* Send answer to telemetry server */
     answerString = g_connectedNodeIp + ",answer";
     fifoWrite( answerString );
     while ( g_fifoReply == "" ) {
         QCoreApplication::processEvents();
     }
 
-    // Connect audio as Server
+    /* Connect audio as Server */
     answerString = "127.0.0.1,connect_audio_as_server";
     fifoWrite( answerString );
 
@@ -1462,28 +1416,31 @@ void MainWindow::on_answerButton_clicked()
     ui->denyButton->setText("Hangup");
 }
 
-/* Deny button on popup */
+/* Deny button ('Hangup') on popup ( 'Client' terminates ) */
 void MainWindow::on_denyButton_clicked()
 {
     screenBlanktimer->start(BLACK_OUT_TIME);
+    /* Hangup to FIFO */
     QString hangupCommandString = g_connectedNodeIp + ",hangup";
     fifoWrite( hangupCommandString );
     while ( g_fifoReply == "" ) {
         QCoreApplication::processEvents();
     }
-    // Turn off local audio
+    /* Turn off local audio */
     hangupCommandString = "127.0.0.1,disconnect_audio";
     fifoWrite( hangupCommandString );
     updateCallStatusIndicator("Incoming Terminated", "green","transparent",LOG_AND_INDICATE);
     ui->inComingFrame->setVisible(false);
-    // Erase green status
+
+    /* Erase green status */
     ui->contact1Selected->setVisible(0);
     ui->contact2Selected->setVisible(0);
     ui->contact3Selected->setVisible(0);
     ui->contact4Selected->setVisible(0);
     ui->contact5Selected->setVisible(0);
     ui->contact6Selected->setVisible(0);
-    // Activate 'contacts' again
+
+    /* Activate 'contacts' again */
     setContactButtons(true);
     ui->answerButton->setEnabled(true);
     ui->answerButton->setVisible(true);
@@ -1494,16 +1451,25 @@ void MainWindow::on_denyButton_clicked()
     if ( uPref.m_autoerase == "true") {
         on_eraseButton_clicked();
     }
-    on_redButton_clicked();
+
+    g_connectState = false;
+    g_connectedNodeId = "";
+    g_connectedNodeIp = "";
+    g_remoteOtpPeerIp = "";
+
+    /* Erase msg history */
+    if ( uPref.m_autoerase == "true") {
+        on_eraseButton_clicked();
+    }
 }
 
-// Power button on PIN dialog
+/* Power button on PIN dialog */
 void MainWindow::on_pinButton_pwr_clicked()
 {
     on_pwrButton_clicked();
 }
 
-/* Read dpinger service output file (with timer) */
+/* Read dpinger service output file with timer */
 void MainWindow::networkLatency()
 {
     QString networkStatusFile="/tmp/network";
@@ -1538,7 +1504,7 @@ void MainWindow::networkLatency()
         }
     }
     peerLatency();
-    /* Let's keep screen on while connected */
+    /* Keep screen on while connected */
     if ( g_connectState ) {
         screenBlanktimer->start(BLACK_OUT_TIME);
     }
@@ -1582,9 +1548,7 @@ void MainWindow::peerLatency()
     QStringList peerStatusFileNames = { "/tmp/peer0","/tmp/peer1","/tmp/peer2","/tmp/peer3","/tmp/peer4","/tmp/peer5" };
 
     for (int i = 0; i < peerStatusFileNames.size(); i++) {
-        /* Filename */
         QString fileName=peerStatusFileNames.at(i).toLocal8Bit().constData();
-        /* Read file */
         QString entryLatency;
         QFile peerLatencyFile( fileName );
         if(!peerLatencyFile.exists()) {
@@ -1603,8 +1567,7 @@ void MainWindow::peerLatency()
             m_peerLatencyValue[i] = QString::number(latencyIntms);
         }
     }
-
-    // Peer latency
+    /* Peer latency */
     if ( m_peerLatencyValue[0].toInt() > 0 ) {
         ui->contact1Button->setStyleSheet(highlightStyle);
     } else {
@@ -1635,7 +1598,6 @@ void MainWindow::peerLatency()
     } else {
         ui->contact6Button->setStyleSheet(normalStyle);
     }
-
 }
 
 /* This function will read key file lenghts and counter values of each key.
@@ -1670,7 +1632,7 @@ void MainWindow::reloadKeyUsage()
                 keyfile = "/opt/tunnel/" + nodes.myNodeId + nodes.node_id[x] +".inkey";
                 keyCountfile = "/opt/tunnel/" + nodes.myNodeId + nodes.node_id[x] +".incount";
             }
-            // Read actual information
+            /* Read actual information */
             long int key_file_size = get_file_size(keyfile);
             long int rx_key_used = get_key_index(keyCountfile);
             float key_presentage = (100.0*rx_key_used)/key_file_size;
@@ -1732,26 +1694,27 @@ void MainWindow::on_exitButton_clicked()
 {
     ui->codeValue->setText("");
     ui->settingsFrame->setVisible(false);
+    ui->logoLabel->setVisible(true);
 }
 
-/* WIFI Network connect
+/* WIFI Network connect with iwd
 
     1. Connect
     iwctl --passphrase [password] station wlan0 connect [ssid]
 
     2. Status
     ./wifi_status.sh
-    connected Zyxel_57C9 192.168.5.91
+    connected [SSID] [IP]
 
     3. Interface IP's
     ./wifi_interfaceips.sh
-    wlan0,192.168.5.91,eth0,192.168.5.90
+    wlan0,[IP],eth0,[IP]
 
     4. Get known networks
     ./wifi_getknownnetworks.sh
 
     5. Forget
-    iwctl known-networks Zyxel_57C9 forget
+    iwctl known-networks [SSID] forget
 */
 
 void MainWindow::scanAvailableWifiNetworks(QString command, QStringList parameters)
@@ -1859,7 +1822,6 @@ void MainWindow::on_deleteWifiButton_clicked()
     ui->deleteWifiButton->setStyleSheet(m_buttonNormalStyle);
 }
 
-
 void MainWindow::on_wifiPasswordText_textChanged(const QString &arg1)
 {
     int passwordEntryLen=ui->wifiPasswordText->text().length();
@@ -1871,7 +1833,6 @@ void MainWindow::on_wifiPasswordText_textChanged(const QString &arg1)
         ui->saveWifiButton->setEnabled(false);
     }
 }
-
 
 void MainWindow::on_saveGatewayButton_clicked()
 {
@@ -1897,7 +1858,7 @@ void MainWindow::on_saveGatewayButton_clicked()
        lineCount = iniFileLines.size();
     }
 
-    // Write conf for networkd
+    /* Write conf for networkd */
     QFile networkdFile( WG_CONFIGURATION_FILE );
     if ( networkdFile.open(QIODevice::ReadWrite) )
     {
@@ -1908,7 +1869,7 @@ void MainWindow::on_saveGatewayButton_clicked()
         }
     }
     networkdFile.close();
-    // Write conf to persisted use
+    /* Write conf to persisted location */
     QFile persistedFile( WG_CONFIGURATION_FILE_S );
     if ( persistedFile.open(QIODevice::ReadWrite) )
     {
@@ -1925,7 +1886,7 @@ void MainWindow::on_saveGatewayButton_clicked()
 }
 
 /* Check IPv4 validity
- * Source: https://stackoverflow.com/questions/791982/determine-if-a-string-is-a-valid-ipv4-address-in-c
+ * [1] https://stackoverflow.com/questions/791982/determine-if-a-string-is-a-valid-ipv4-address-in-c
  */
 int MainWindow::isValidIp4 (char *str) {
     int segs = 0;   /* Segment count. */
@@ -1974,7 +1935,7 @@ void MainWindow::on_gatewayIpPortInput_textChanged(const QString &arg1)
 {
     QString connectionPointIpAndPort=ui->gatewayIpPortInput->text();
     QStringList gwParts=connectionPointIpAndPort.split(":");
-    // Check input validity
+    /* Check input validity */
     if ( gwParts.count() == 2 ) {
         std::string str = gwParts[0].toStdString();
         char*p = (char*)str.c_str();
@@ -1990,7 +1951,6 @@ void MainWindow::on_gatewayIpPortInput_textChanged(const QString &arg1)
         ui->saveGatewayButton->setEnabled(false);
     }
 }
-
 
 void MainWindow::on_autoeraseCheckbox_stateChanged(int arg1)
 {
@@ -2026,3 +1986,89 @@ void MainWindow::finalCountdown()
         m_finalCountdownValue--;
     }
 }
+
+void MainWindow::on_camButton_clicked()
+{
+    ui->imageFrame->setVisible(1);
+    ui->imageFrameSendPicture->setVisible(0);
+    ui->imageFramePictureLabel->clear();
+    ui->imageFrameTakePictureButton->setVisible(1);
+}
+
+void MainWindow::on_imageFrameCloseButton_clicked()
+{
+    ui->imageFramePictureLabel->clear();
+    ui->imageFrame->setVisible(0);
+}
+
+void MainWindow::on_imageFrameTakePictureButton_clicked()
+{
+    qint64 pid;
+    QProcess process;
+    process.setProgram("/bin/takepicture.sh");
+    process.setArguments({""});
+    process.start();
+    process.waitForFinished();
+    /* TODO: Timeout */
+    QString camPictureFile(CAMERA_PIC_FILE);
+    QFile fileCheck(camPictureFile);
+    if ( fileCheck.exists() ) {
+        ui->imageFramePictureLabel->setPixmap(QPixmap(camPictureFile));
+        if (g_connectState)
+            ui->imageFrameSendPicture->setVisible(1);
+    }
+
+}
+
+void MainWindow::on_imageFrameSendPicture_clicked()
+{
+    qint64 pid;
+    QProcess process;
+    process.setProgram("/bin/sendpicture.sh");
+    process.setArguments({g_remoteOtpPeerIp});
+    process.start();
+    process.waitForFinished();
+    /* TODO: Timeout */
+}
+
+void MainWindow::incomingImageChangeDetected()
+{
+    QFile myFile("/tmp/ftp/incoming/image.png");
+    if (myFile.open(QIODevice::ReadOnly)){
+        m_imageFileSize = myFile.size();
+        myFile.close();
+    }
+    if ( m_timerBlock == false )  {
+        ui->imageFrame->setVisible(1);
+        QTimer::singleShot(5000, this, SLOT(incomingImageVerifyChange()));
+        m_timerBlock = true;
+    }
+    ui->imageFramePictureLabel->setText("Received " + QString::number(m_imageFileSize) + " bytes");
+}
+
+void MainWindow::incomingImageVerifyChange()
+{
+    m_timerBlock = false;
+    QFile myFile("/tmp/ftp/incoming/image.png");
+    int size=0;
+    if (myFile.open(QIODevice::ReadOnly)){
+        size = myFile.size();
+        myFile.close();
+    }
+    if ( size == m_imageFileSize ) {
+        ui->imageFramePictureLabel->setText("");
+        QString camPictureFile("/tmp/ftp/incoming/image.png");
+        QFile fileCheck(camPictureFile);
+        if ( fileCheck.exists() ) {
+            ui->imageFramePictureLabel->setPixmap(QPixmap(camPictureFile));
+        }
+        ui->imageFrameTakePictureButton->setVisible(0);
+        ui->imageFrameSendPicture->setVisible(0);
+        ui->imageFrame->setVisible(1);
+    }
+
+}
+
+
+
+

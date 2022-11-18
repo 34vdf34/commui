@@ -1,4 +1,0 @@
-#ifndef LOCALSERVER_H
-#define LOCALSERVER_H
-
-#endif // LOCALSERVER_H

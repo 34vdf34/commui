@@ -909,9 +909,9 @@ QPushButton#route1Button:checkked {
     <property name="geometry">
      <rect>
       <x>1200</x>
-      <y>150</y>
+      <y>50</y>
       <width>71</width>
-      <height>561</height>
+      <height>661</height>
      </rect>
     </property>
     <property name="focusPolicy">
@@ -959,11 +959,11 @@ border-radius: 4px;
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="volumeTitleLabel">
     <property name="geometry">
      <rect>
-      <x>1200</x>
-      <y>120</y>
+      <x>1202</x>
+      <y>20</y>
       <width>66</width>
       <height>18</height>
      </rect>
@@ -1064,6 +1064,9 @@ color: lightgreen;
 padding: 5px;
 font:   30px;</string>
     </property>
+    <property name="locale">
+     <locale language="English" country="UnitedStates"/>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -1077,9 +1080,9 @@ font:   30px;</string>
    <widget class="QPushButton" name="eraseButton">
     <property name="geometry">
      <rect>
-      <x>530</x>
+      <x>550</x>
       <y>150</y>
-      <width>141</width>
+      <width>120</width>
       <height>41</height>
      </rect>
     </property>
@@ -1119,7 +1122,7 @@ QPushButton#eraseButton:pressed {
    <widget class="QPushButton" name="commCheckButton">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>350</x>
       <y>150</y>
       <width>181</width>
       <height>41</height>
@@ -1163,7 +1166,7 @@ QPushButton#commCheckButton:pressed {
      <rect>
       <x>10</x>
       <y>140</y>
-      <width>301</width>
+      <width>200</width>
       <height>51</height>
      </rect>
     </property>
@@ -2595,10 +2598,10 @@ font:   30px;</string>
     <widget class="QLabel" name="logoLabel">
      <property name="geometry">
       <rect>
-       <x>150</x>
+       <x>20</x>
        <y>250</y>
-       <width>250</width>
-       <height>300</height>
+       <width>450</width>
+       <height>450</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -2647,6 +2650,273 @@ font: bold 820px;
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
+   <widget class="QFrame" name="imageFrame">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>1260</width>
+      <height>710</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color:rgba(0, 0, 0, 240)</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QPushButton" name="imageFrameCloseButton">
+     <property name="geometry">
+      <rect>
+       <x>1060</x>
+       <y>640</y>
+       <width>191</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans Condensed</family>
+       <pointsize>-1</pointsize>
+       <weight>75</weight>
+       <italic>false</italic>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+    background-color: transparent;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: green;
+   color: green;
+    font: bold 30px;
+    min-width: 1em;
+    padding: 6px;
+}
+QPushButton:pressed {
+    background-color: rgb(0,255, 0);
+    border-style: inset;
+}
+</string>
+     </property>
+     <property name="text">
+      <string>Close</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="imageFrameTakePictureButton">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>640</y>
+       <width>241</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans Condensed</family>
+       <pointsize>-1</pointsize>
+       <weight>75</weight>
+       <italic>false</italic>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+    background-color: transparent;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: green;
+   color: green;
+    font: bold 30px;
+    min-width: 1em;
+    padding: 6px;
+}
+QPushButton:pressed {
+    background-color: rgb(0,255, 0);
+    border-style: inset;
+}
+</string>
+     </property>
+     <property name="text">
+      <string>Take picture</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="imageFramePictureLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>1240</width>
+       <height>600</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"> color: green;
+ font: 60px;
+</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="imageFrameSendPicture">
+     <property name="geometry">
+      <rect>
+       <x>540</x>
+       <y>640</y>
+       <width>241</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>DejaVu Sans Condensed</family>
+       <pointsize>-1</pointsize>
+       <weight>75</weight>
+       <italic>false</italic>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+    background-color: transparent;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: green;
+   color: green;
+    font: bold 30px;
+    min-width: 1em;
+    padding: 6px;
+}
+QPushButton:pressed {
+    background-color: rgb(0,255, 0);
+    border-style: inset;
+}
+</string>
+     </property>
+     <property name="text">
+      <string>Send</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="camButton">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>150</y>
+      <width>100</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>DejaVu Sans Condensed</family>
+      <pointsize>-1</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+      <kerning>false</kerning>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    background-color: transparent;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: green;
+   	color: green;
+    font:   24px;
+    border-style: outset;
+    padding: 6px;
+}
+QPushButton:pressed {
+    background-color: green;
+    border-style: inset;
+}</string>
+    </property>
+    <property name="text">
+     <string>Cam</string>
+    </property>
+   </widget>
+   <zorder>label_2</zorder>
+   <zorder>contact6Selected</zorder>
+   <zorder>contact4Selected</zorder>
+   <zorder>contact6Button</zorder>
+   <zorder>route3Button</zorder>
+   <zorder>contact4Button</zorder>
+   <zorder>contact2Selected</zorder>
+   <zorder>contact1Selected</zorder>
+   <zorder>contact1Button</zorder>
+   <zorder>redButton</zorder>
+   <zorder>route2Selected</zorder>
+   <zorder>route3Selected</zorder>
+   <zorder>route2Button</zorder>
+   <zorder>greenButton</zorder>
+   <zorder>contact5Selected</zorder>
+   <zorder>route1Selected</zorder>
+   <zorder>routeTitle</zorder>
+   <zorder>contact5Button</zorder>
+   <zorder>route1Button</zorder>
+   <zorder>voiceActive</zorder>
+   <zorder>contact2Button</zorder>
+   <zorder>contactTitle</zorder>
+   <zorder>contact3Button</zorder>
+   <zorder>contact3Selected</zorder>
+   <zorder>systemNameLabel</zorder>
+   <zorder>volumeSlider</zorder>
+   <zorder>volumeTitleLabel</zorder>
+   <zorder>messagesView</zorder>
+   <zorder>lineEdit</zorder>
+   <zorder>eraseButton</zorder>
+   <zorder>camButton</zorder>
+   <zorder>commCheckButton</zorder>
+   <zorder>messagingTitle</zorder>
+   <zorder>pwrButton</zorder>
+   <zorder>myNodeName</zorder>
+   <zorder>inComingFrame</zorder>
+   <zorder>keyPrecentage</zorder>
+   <zorder>networkLatencyLabel</zorder>
+   <zorder>codeFrame</zorder>
+   <zorder>countLabel</zorder>
+   <zorder>imageFrame</zorder>
   </widget>
  </widget>
  <resources>

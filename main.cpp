@@ -28,13 +28,13 @@ int main(int argc, char *argv[])
 {
     qputenv("QT_QPA_FONTDIR", "/usr/share/fonts/dejavu/");
     qputenv("QT_QPA_EGLFS_ROTATION", "-90");
-    // Development:
     qputenv("QT_ASSUME_STDERR_HAS_CONSOLE", "1");
-
     QApplication a(argc, argv);
     a.setOrganizationName("resiliencetheatre");
     a.setOrganizationDomain("rd");
-    a.setApplicationName("sinm");      
+    a.setApplicationName("sinm");
+    a.setOverrideCursor(Qt::BlankCursor);
+
     QStringList args = a.arguments();
     if (args.count() == 2)
     {
