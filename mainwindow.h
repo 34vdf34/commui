@@ -199,6 +199,7 @@ private:
         QString pinEntryTitleVaultChecking;
         QString pinEntryTitleAccessPin;
         bool cameraButtonVisible;
+        QString audioMixerOutputDevice;
     };
     uiStrings uiElement;
     void loadUserInterfacePreferences();

@@ -863,7 +863,7 @@ void MainWindow::setSystemVolume(int volume)
     qint64 pid;
     QProcess process;
     process.setProgram("/usr/bin/amixer");
-    process.setArguments({"sset","'PCM'",volumePercentString});
+    process.setArguments({"sset","'"+uiElement.audioMixerOutputDevice+"'",volumePercentString});
     process.setStandardOutputFile(QProcess::nullDevice());
     process.setStandardErrorFile(QProcess::nullDevice());
     process.startDetached(&pid);
@@ -915,6 +915,7 @@ void MainWindow::loadUserInterfacePreferences()
     uiElement.pinEntryTitleVaultChecking = settings.value("pintitle_vault_check","Checking...").toString();
     uiElement.pinEntryTitleAccessPin = settings.value("pintitle_access","Set calibration data:").toString();
     uiElement.cameraButtonVisible = settings.value("cam_enabled",false).toBool();
+    uiElement.audioMixerOutputDevice = settings.value("audio_device","PCM").toString();
     ui->systemNameLabel->setText(uiElement.systemName);
     ui->messagingTitle->setText(uiElement.messagingTitle);
     ui->commCheckButton->setText(uiElement.commCheckButton);
