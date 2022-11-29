@@ -550,8 +550,28 @@ void MainWindow::fifoChanged(const QString & path)
           updateCallStatusIndicator("Remote busy", "green", "transparent",LOG_ONLY );
       }
       if( token[1].compare("offline") == 0 )
-      {
+      {          
           updateCallStatusIndicator("Remote offline", "green", "transparent",LOG_ONLY );
+          if ( g_connectState ) {
+              /* Tear connection down without remote involvement */
+              updateCallStatusIndicator("Auto disconnect", "green", "transparent",LOG_ONLY );
+              ui->contact1Selected->setVisible(0);
+              ui->contact2Selected->setVisible(0);
+              ui->contact3Selected->setVisible(0);
+              ui->contact4Selected->setVisible(0);
+              ui->contact5Selected->setVisible(0);
+              ui->contact6Selected->setVisible(0);
+              QTimer::singleShot(3 * 1000, this, SLOT(tearDownLocal()));
+              removeLocalFile("/tmp/CLIENT_CALL_ACTIVE");
+              ui->keyPrecentage->setText("");
+              ui->redButton->setStyleSheet(s_terminateButtonStyle_normal);
+              ui->greenButton->setStyleSheet(s_goSecureButtonStyle_normal);
+              ui->greenButton->setEnabled(false);
+              g_connectState = false;
+              g_connectedNodeId = "";
+              g_connectedNodeIp = "";
+              g_remoteOtpPeerIp = "";
+          }
       }
   }
     /* TODO: Other status codes
