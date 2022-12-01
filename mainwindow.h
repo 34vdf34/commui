@@ -138,7 +138,11 @@ private slots:
     void incomingImageChangeDetected();
     void incomingImageVerifyChange();
     void tearDownLocal();
+    int waitForFifoReply();
+    int checkFifoReplyTimeout();
 
+
+    void on_audioDeviceInput_textChanged(const QString &arg1);
 
 private:
     Ui::MainWindow *ui;
@@ -205,11 +209,13 @@ private:
     void loadUserInterfacePreferences();
     QTimer *screenBlanktimer;
     QTimer *countdownTimer;
+    QTimer *fifoReplyTimer;
     bool g_connectState;
     QString g_connectedNodeId;
     QString g_connectedNodeIp;
     QString g_remoteOtpPeerIp;
     QString g_fifoReply;
+    bool g_fifoCheckInProgress;
     double rxKeyRemaining;
     double txKeyRemaining;
     QString txKeyRemainingString;

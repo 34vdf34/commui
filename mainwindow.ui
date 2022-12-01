@@ -2594,12 +2594,62 @@ font:   30px;</string>
        <string/>
       </property>
      </widget>
+     <widget class="QLineEdit" name="audioDeviceInput">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>360</y>
+        <width>371</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: rgba(0, 0, 0,200);
+border-style: outset;
+border-width: 2px;
+border-radius: 2px;
+border-color: green;
+color: lightgreen;
+padding: 5px;
+font:   30px;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="maxLength">
+       <number>190</number>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="generalSettingsLabelAudio">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>300</y>
+        <width>600</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">    background-color: transparent;
+   color: green;
+    font:   32px;
+    min-width: 1em;
+    padding: 3px;
+</string>
+      </property>
+      <property name="text">
+       <string>Mixer device for volume control:</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QLabel" name="logoLabel">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>250</y>
+       <y>230</y>
        <width>450</width>
        <height>450</height>
       </rect>
@@ -2625,6 +2675,35 @@ font:   30px;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="versionLabel">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>660</y>
+       <width>450</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">    background-color: transparent;
+    border-width: 0px;
+    color: green;
+    font:  28px;
+    min-width: 1em;
+    padding: 6px;
+
+</string>
+     </property>
+     <property name="text">
+      <string>v0.1</string>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
    </widget>

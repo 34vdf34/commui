@@ -58,6 +58,8 @@
 #define TX_KEY_PRESENTAGE       "/tmp/tx-key-presentage"
 #define RX_KEY_PRESENTAGE       "/tmp/rx-key-presentage"
 #define SUBSTITUTE_CHAR_CODE    24
+#define FIFO_TIMEOUT            1
+#define FIFO_REPLY_RECEIVED     0
 
 /* Global fifoIn file handle */
 QFile fifoIn(TELEMETRY_FIFO_OUT);
@@ -91,6 +93,9 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
     QFile fileCheck(logoGraphFile);
     if ( fileCheck.exists() )
         ui->logoLabel->setPixmap(QPixmap(logoGraphFile));
+
+    /* Set version string */
+    ui->versionLabel->setText("v0.2");
 
     if ( argumentValue == VAULT_MODE ) {
         m_startMode = VAULT_MODE;
@@ -469,26 +474,32 @@ void MainWindow::fifoChanged(const QString & path)
             }
           }
           if( nodeNumber == 0 ) {
+                ui->contact1Selected->setStyleSheet("background-color: lightgreen;");
                 connectAsClient(nodes.node_ip[nodeNumber], nodes.node_id[nodeNumber]);
                 ui->contact1Selected->setVisible(1);
           }
           if( nodeNumber == 1 ) {
+                ui->contact2Selected->setStyleSheet("background-color: lightgreen;");
                 connectAsClient(nodes.node_ip[nodeNumber], nodes.node_id[nodeNumber]);
                 ui->contact2Selected->setVisible(1);
           }
           if( nodeNumber == 2 ) {
+                ui->contact3Selected->setStyleSheet("background-color: lightgreen;");
                 connectAsClient(nodes.node_ip[nodeNumber], nodes.node_id[nodeNumber]);
                 ui->contact3Selected->setVisible(1);
           }
           if( nodeNumber == 3 ) {
+                ui->contact4Selected->setStyleSheet("background-color: lightgreen;");
                 connectAsClient(nodes.node_ip[nodeNumber], nodes.node_id[nodeNumber]);
                 ui->contact4Selected->setVisible(1);
           }
           if( nodeNumber == 4 ) {
+                ui->contact5Selected->setStyleSheet("background-color: lightgreen;");
                 connectAsClient(nodes.node_ip[nodeNumber], nodes.node_id[nodeNumber]);
                 ui->contact5Selected->setVisible(1);
           }
           if( nodeNumber == 5 ) {
+                ui->contact6Selected->setStyleSheet("background-color: lightgreen;");
                 connectAsClient(nodes.node_ip[nodeNumber], nodes.node_id[nodeNumber]);
                 ui->contact6Selected->setVisible(1);
           }
@@ -552,8 +563,10 @@ void MainWindow::fifoChanged(const QString & path)
       if( token[1].compare("offline") == 0 )
       {          
           updateCallStatusIndicator("Remote offline", "green", "transparent",LOG_ONLY );
-          if ( g_connectState ) {
-              /* Tear connection down without remote involvement */
+
+          /* Disabled */
+          if ( 0 && g_connectState ) {
+              /* Tear connection down without remote involvement. */
               updateCallStatusIndicator("Auto disconnect", "green", "transparent",LOG_ONLY );
               ui->contact1Selected->setVisible(0);
               ui->contact2Selected->setVisible(0);
@@ -567,11 +580,13 @@ void MainWindow::fifoChanged(const QString & path)
               ui->redButton->setStyleSheet(s_terminateButtonStyle_normal);
               ui->greenButton->setStyleSheet(s_goSecureButtonStyle_normal);
               ui->greenButton->setEnabled(false);
+              ui->inComingFrame->setVisible(false);
               g_connectState = false;
               g_connectedNodeId = "";
               g_connectedNodeIp = "";
               g_remoteOtpPeerIp = "";
           }
+
       }
   }
     /* TODO: Other status codes
@@ -871,13 +886,14 @@ void MainWindow::saveAndActivateConnectionProfile(QString profile)
     }
 }
 
-/* Set system volume with external process */
+/*
+ * Set system volume with external process.
+ * Only playback volume is adjusted.
+ */
 void MainWindow::setSystemVolume(int volume)
 {
-    /* TODO: Device naming
-     * USB HF: amixer sset Headset 100
-                amixer sset Headset Capture 5%+
-    */
+    /* Playback volume:     amixer sset [DEVICENAME] 100%
+       Microphone volume:   amixer sset [DEVICENAME] Capture 5%+ */
 
     QString volumePercentString = QString::number(volume) + "%";
     qint64 pid;
@@ -943,6 +959,7 @@ void MainWindow::loadUserInterfacePreferences()
     ui->greenButton->setText(uiElement.goSecureButton);
     ui->redButton->setText(uiElement.terminateSecureButton);
     ui->pinEntryTitle->setText(uiElement.pinEntryTitleAccessPin);
+    ui->audioDeviceInput->setText(uiElement.audioMixerOutputDevice);
 
     if ( uiElement.cameraButtonVisible ) {
         ui->camButton->setVisible(1);
@@ -950,6 +967,33 @@ void MainWindow::loadUserInterfacePreferences()
         ui->camButton->setVisible(0);
     }
 }
+
+
+/* Timeout for FIFO replies */
+int MainWindow::waitForFifoReply() {
+    g_fifoCheckInProgress = true;
+    fifoReplyTimer = new QTimer(this);
+    fifoReplyTimer->start(10000); // 10 s
+    connect(fifoReplyTimer, SIGNAL(timeout()), this, SLOT(checkFifoReplyTimeout()) );
+
+        while ( g_fifoReply == "" && g_fifoCheckInProgress == true ) {
+            QCoreApplication::processEvents();
+            if ( g_fifoReply != "" ) {
+                fifoReplyTimer->stop();
+                return FIFO_REPLY_RECEIVED;
+            }
+        }
+
+    if ( g_fifoReply == "" && g_fifoCheckInProgress == false )
+        return FIFO_TIMEOUT;
+}
+
+int MainWindow::checkFifoReplyTimeout() {
+    g_fifoCheckInProgress = false;
+    fifoReplyTimer->stop();
+    return 0;
+}
+
 
 /* 'Go Secure' button */
 void MainWindow::on_greenButton_clicked()
@@ -959,9 +1003,13 @@ void MainWindow::on_greenButton_clicked()
     /* Send telemetry 'ring' -> ring_ready */
     QString callString = g_connectedNodeIp + ",ring";
     fifoWrite( callString );
-    while ( g_fifoReply == "" ) {
-        QCoreApplication::processEvents();
+
+    // Wait FIFO with timeout
+    if ( waitForFifoReply() == FIFO_TIMEOUT ) {
+        updateCallStatusIndicator("Timeout. Aborting.", "green", "transparent",LOG_ONLY );
+        return;
     }
+
     /* Send 'ring' to UI */
     callString = g_connectedNodeIp + ",message,ring";
     fifoWrite( callString );
@@ -971,9 +1019,7 @@ void MainWindow::on_greenButton_clicked()
 void MainWindow::on_redButton_clicked()
 {
     screenBlanktimer->start(BLACK_OUT_TIME);
-
     updateCallStatusIndicator("Terminating...", "lightgreen", "transparent",INDICATE_ONLY );
-
     ui->contact1Selected->setVisible(0);
     ui->contact2Selected->setVisible(0);
     ui->contact3Selected->setVisible(0);
@@ -1296,9 +1342,10 @@ void MainWindow::connectAsClient(QString nodeIp, QString nodeId)
     QString prepareFifoCmd = nodeIp + ",prepare";
     fifoWrite(prepareFifoCmd);
 
-        /* TODO: THIS NEEDS TO BE REWORKED */
-        while ( g_fifoReply == "" ) {
-            QCoreApplication::processEvents();
+        // Wait FIFO with timeout
+        if ( waitForFifoReply() == FIFO_TIMEOUT ) {
+            updateCallStatusIndicator("Timeout. Aborting.", "green", "transparent",LOG_ONLY );
+            return;
         }
 
     /* 2. Start local service for targeted node as client */
@@ -1336,10 +1383,12 @@ void MainWindow::connectAsClient(QString nodeIp, QString nodeId)
     QString informRemoteUi = nodeIp + ",message,client_connected;"+nodes.myNodeId+";"+nodes.myNodeIp+";"+nodes.myNodeName;
     fifoWrite(informRemoteUi);
 
-    /*  TODO: THIS NEEDS TO BE REWORKED !! */
-    while ( g_fifoReply == "" ) {
-        QCoreApplication::processEvents();
+    // Wait FIFO with timeout
+    if ( waitForFifoReply() == FIFO_TIMEOUT ) {
+        updateCallStatusIndicator("Timeout. Aborting.", "green", "transparent",LOG_ONLY );
+        return;
     }
+
     // 7. Audio gets established by remote end sending 'answer'
     // 8. After termination => terminate_ready
 }
@@ -1351,19 +1400,20 @@ void MainWindow::disconnectAsClient(QString nodeIp, QString nodeId)
     QString terminateFifoCmd = nodeIp + ",terminate";
     fifoWrite(terminateFifoCmd);
 
-    /*  TODO: THIS NEEDS TO BE REWORKED !! */
-    while ( g_fifoReply == "" ) {
-        QCoreApplication::processEvents();
+    // Wait FIFO with timeout
+    if ( waitForFifoReply() == FIFO_TIMEOUT ) {
+        updateCallStatusIndicator("Timeout. Aborting.", "green", "transparent",LOG_ONLY );
+        return;
     }
+
     /* 2. Terminate to UI (so remote can tear down indications) */
     terminateFifoCmd = nodeIp + ",message,initiator_disconnect";
     fifoWrite(terminateFifoCmd);
 
-    /*  TODO: THIS NEEDS TO BE REWORKED !!
-        Let's wait for reply
-    */
-    while ( g_fifoReply == "" ) {
-        QCoreApplication::processEvents();
+    // Wait FIFO with timeout
+    if ( waitForFifoReply() == FIFO_TIMEOUT ) {
+        updateCallStatusIndicator("Timeout. Aborting.", "green", "transparent",LOG_ONLY );
+        return;
     }
 
     /* 2. Stop local service for targeted node (as client) */
@@ -1391,7 +1441,6 @@ void MainWindow::disconnectAsClient(QString nodeIp, QString nodeId)
     if ( uPref.m_autoerase == "true") {
         on_eraseButton_clicked();
     }
-    // on_redButton_clicked(); 18thNov
 }
 
 void MainWindow::touchLocalFile(QString filename)
@@ -1415,15 +1464,21 @@ void MainWindow::on_answerButton_clicked()
     /* Send indication that we answered succesfully */
     QString answerString = g_connectedNodeIp + ",message,answer_success";
     fifoWrite( answerString );
-    while ( g_fifoReply == "" ) {
-        QCoreApplication::processEvents();
+
+    // Wait FIFO with timeout
+    if ( waitForFifoReply() == FIFO_TIMEOUT ) {
+        updateCallStatusIndicator("Timeout. Aborting.", "green", "transparent",LOG_ONLY );
+        return;
     }
 
     /* Send answer to telemetry server */
     answerString = g_connectedNodeIp + ",answer";
     fifoWrite( answerString );
-    while ( g_fifoReply == "" ) {
-        QCoreApplication::processEvents();
+
+    // Wait FIFO with timeout
+    if ( waitForFifoReply() == FIFO_TIMEOUT ) {
+        updateCallStatusIndicator("Timeout. Aborting.", "green", "transparent",LOG_ONLY );
+        return;
     }
 
     /* Connect audio as Server */
@@ -1444,9 +1499,13 @@ void MainWindow::on_denyButton_clicked()
     /* Hangup to FIFO */
     QString hangupCommandString = g_connectedNodeIp + ",hangup";
     fifoWrite( hangupCommandString );
-    while ( g_fifoReply == "" ) {
-        QCoreApplication::processEvents();
+
+    // Wait FIFO with timeout
+    if ( waitForFifoReply() == FIFO_TIMEOUT ) {
+        updateCallStatusIndicator("Timeout. Aborting.", "green", "transparent",LOG_ONLY );
+        return;
     }
+
     /* Turn off local audio */
     hangupCommandString = "127.0.0.1,disconnect_audio";
     fifoWrite( hangupCommandString );
@@ -2090,6 +2149,10 @@ void MainWindow::incomingImageVerifyChange()
 
 }
 
-
-
+void MainWindow::on_audioDeviceInput_textChanged(const QString &arg1)
+{
+    QSettings settings(UI_ELEMENTS_INI_FILE,QSettings::IniFormat);
+    settings.setValue("audio_device", arg1 );
+    uiElement.audioMixerOutputDevice = arg1;
+}
 
