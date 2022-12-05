@@ -95,7 +95,7 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
         ui->logoLabel->setPixmap(QPixmap(logoGraphFile));
 
     /* Set version string */
-    ui->versionLabel->setText("v0.2");
+    ui->versionLabel->setText("v0.21");
 
     if ( argumentValue == VAULT_MODE ) {
         m_startMode = VAULT_MODE;
@@ -1123,8 +1123,8 @@ void MainWindow::on_pwrButton_clicked()
 {
     qint64 pid;
     QProcess process;
-    process.setProgram("systemctl");
-    process.setArguments({"poweroff"});
+    process.setProgram("/sbin/poweroff");
+    process.setArguments({"-f"});
     process.startDetached(&pid);
 }
 
