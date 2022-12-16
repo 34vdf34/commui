@@ -92,9 +92,9 @@ color: rgb(237, 51, 59);</string>
      <font>
       <family>DejaVu Sans Condensed</family>
       <pointsize>-1</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="focusPolicy">
@@ -108,7 +108,7 @@ color: rgb(237, 51, 59);</string>
     border-radius: 10px;
     border-color: green;
    color: green;
-    font: bold 30px;
+    font:  30px;
     min-width: 1em;
     padding: 6px;
 }
@@ -142,9 +142,9 @@ QPushButton#route1Button:checkked {
      <font>
       <family>DejaVu Sans Condensed</family>
       <pointsize>-1</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="focusPolicy">
@@ -158,7 +158,7 @@ QPushButton#route1Button:checkked {
     border-radius: 10px;
     border-color: green;
    color: green;
-    font: bold 30px;
+    font:  30px;
     min-width: 1em;
     padding: 6px;
 }
@@ -246,9 +246,9 @@ QPushButton#route1Button:checkked {
      <font>
       <family>DejaVu Sans Condensed</family>
       <pointsize>-1</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="focusPolicy">
@@ -262,7 +262,7 @@ QPushButton#route1Button:checkked {
     border-radius: 10px;
     border-color: green;
    color: green;
-    font: bold 30px;
+    font:  30px;
     min-width: 1em;
     padding: 6px;
 }
@@ -409,9 +409,9 @@ QPushButton#greenButton:pressed {
      <font>
       <family>DejaVu Sans Condensed</family>
       <pointsize>-1</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="focusPolicy">
@@ -425,7 +425,7 @@ QPushButton#greenButton:pressed {
     border-radius: 10px;
     border-color: green;
    color: green;
-    font: bold 30px;
+    font:  30px;
     min-width: 1em;
     padding: 6px;
 }
@@ -498,9 +498,9 @@ QPushButton#route1Button:checkked {
      <font>
       <family>DejaVu Sans Condensed</family>
       <pointsize>-1</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="focusPolicy">
@@ -514,7 +514,7 @@ QPushButton#route1Button:checkked {
     border-radius: 10px;
     border-color: green;
    color: green;
-    font: bold 30px;
+    font:  30px;
     min-width: 1em;
     padding: 6px;
 }
@@ -567,9 +567,9 @@ QPushButton#route1Button:checkked {
      <font>
       <family>DejaVu Sans Condensed</family>
       <pointsize>-1</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="focusPolicy">
@@ -583,7 +583,7 @@ QPushButton#route1Button:checkked {
     border-radius: 10px;
     border-color: green;
    color: green;
-    font: bold 30px;
+    font:  30px;
     min-width: 1em;
     padding: 6px;
 }
@@ -2960,9 +2960,9 @@ QPushButton:pressed {
      <font>
       <family>DejaVu Sans Condensed</family>
       <pointsize>-1</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="focusPolicy">
@@ -2976,7 +2976,7 @@ QPushButton:pressed {
     border-radius: 10px;
     border-color: green;
    color: green;
-    font: bold 30px;
+    font:  30px;
     min-width: 1em;
     padding: 6px;
 }
@@ -2991,7 +2991,7 @@ QPushButton#route1Button:checkked {
 }</string>
     </property>
     <property name="text">
-     <string>7</string>
+     <string>SATCOM TC</string>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -3037,9 +3037,9 @@ QPushButton#route1Button:checkked {
      <font>
       <family>DejaVu Sans Condensed</family>
       <pointsize>-1</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="focusPolicy">
@@ -3053,7 +3053,7 @@ QPushButton#route1Button:checkked {
     border-radius: 10px;
     border-color: green;
    color: green;
-    font: bold 30px;
+    font:  30px;
     min-width: 1em;
     padding: 6px;
 }
@@ -3068,7 +3068,7 @@ QPushButton#route1Button:checkked {
 }</string>
     </property>
     <property name="text">
-     <string>8</string>
+     <string>MEDIA CTL</string>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -3114,9 +3114,9 @@ QPushButton#route1Button:checkked {
      <font>
       <family>DejaVu Sans Condensed</family>
       <pointsize>-1</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="focusPolicy">
@@ -3130,7 +3130,7 @@ QPushButton#route1Button:checkked {
     border-radius: 10px;
     border-color: green;
    color: green;
-    font: bold 30px;
+    font: 30px;
     min-width: 1em;
     padding: 6px;
 }
@@ -3145,7 +3145,7 @@ QPushButton#route1Button:checkked {
 }</string>
     </property>
     <property name="text">
-     <string>9</string>
+     <string>MEDICAL</string>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -3191,9 +3191,9 @@ QPushButton#route1Button:checkked {
      <font>
       <family>DejaVu Sans Condensed</family>
       <pointsize>-1</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="focusPolicy">
@@ -3207,7 +3207,7 @@ QPushButton#route1Button:checkked {
     border-radius: 10px;
     border-color: green;
    color: green;
-    font: bold 30px;
+    font:  30px;
     min-width: 1em;
     padding: 6px;
 }
@@ -3222,7 +3222,7 @@ QPushButton#route1Button:checkked {
 }</string>
     </property>
     <property name="text">
-     <string>10</string>
+     <string>CYBER HQ</string>
     </property>
     <property name="checkable">
      <bool>true</bool>

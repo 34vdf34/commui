@@ -1553,34 +1553,34 @@ void MainWindow::on_pinButton_pwr_clicked()
 void MainWindow::networkLatency()
 {
     // DEV SUPPORT:
-    ui->contact1Selected->setVisible(1);
+    ui->contact1Selected->setVisible(0);
     ui->contact1Selected->setStyleSheet("background-color: lightgreen;");
 
     ui->contact2Selected->setVisible(1);
     ui->contact2Selected->setStyleSheet("background-color: lightgreen;");
 
-    ui->contact3Selected->setVisible(1);
+    ui->contact3Selected->setVisible(0);
     ui->contact3Selected->setStyleSheet("background-color: lightgreen;");
 
-    ui->contact4Selected->setVisible(1);
+    ui->contact4Selected->setVisible(0);
     ui->contact4Selected->setStyleSheet("background-color: lightgreen;");
 
-    ui->contact5Selected->setVisible(1);
+    ui->contact5Selected->setVisible(0);
     ui->contact5Selected->setStyleSheet("background-color: lightgreen;");
 
-    ui->contact6Selected->setVisible(1);
+    ui->contact6Selected->setVisible(0);
     ui->contact6Selected->setStyleSheet("background-color: lightgreen;");
 
-    ui->contact7Selected->setVisible(1);
+    ui->contact7Selected->setVisible(0);
     ui->contact7Selected->setStyleSheet("background-color: lightgreen;");
 
-    ui->contact8Selected->setVisible(1);
+    ui->contact8Selected->setVisible(0);
     ui->contact8Selected->setStyleSheet("background-color: lightgreen;");
 
-    ui->contact9Selected->setVisible(1);
+    ui->contact9Selected->setVisible(0);
     ui->contact9Selected->setStyleSheet("background-color: lightgreen;");
 
-    ui->contact10Selected->setVisible(1);
+    ui->contact10Selected->setVisible(0);
     ui->contact10Selected->setStyleSheet("background-color: lightgreen;");
 
 
@@ -1632,7 +1632,7 @@ void MainWindow::peerLatency()
             border-radius: 10px; \
             border-color: green; \
            color: green; \
-            font: bold 30px; \
+            font:  30px; \
             min-width: 1em; \
             padding: 6px; \
         } \
@@ -1648,7 +1648,7 @@ void MainWindow::peerLatency()
             border-radius: 10px; \
             border-color: green; \
             color: lightgreen; \
-            font: bold 30px; \
+            font:  30px; \
             min-width: 1em; \
             padding: 6px; \
         } \
