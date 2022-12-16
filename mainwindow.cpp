@@ -1571,6 +1571,18 @@ void MainWindow::networkLatency()
     ui->contact6Selected->setVisible(1);
     ui->contact6Selected->setStyleSheet("background-color: lightgreen;");
 
+    ui->contact7Selected->setVisible(1);
+    ui->contact7Selected->setStyleSheet("background-color: lightgreen;");
+
+    ui->contact8Selected->setVisible(1);
+    ui->contact8Selected->setStyleSheet("background-color: lightgreen;");
+
+    ui->contact9Selected->setVisible(1);
+    ui->contact9Selected->setStyleSheet("background-color: lightgreen;");
+
+    ui->contact10Selected->setVisible(1);
+    ui->contact10Selected->setStyleSheet("background-color: lightgreen;");
+
 
     QString networkStatusFile="/tmp/network";
     QFile networkFile(networkStatusFile);
