@@ -99,7 +99,7 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
         ui->logoLabel->setPixmap(QPixmap(logoGraphFile));
 
     /* Set version string */
-    ui->versionLabel->setText("v0.21");
+    ui->versionLabel->setText("v0.31 (10)");
 
     if ( argumentValue == VAULT_MODE ) {
         m_startMode = VAULT_MODE;
