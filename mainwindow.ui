@@ -2627,7 +2627,7 @@ QPushButton#route1Button:checkked {
 </string>
       </property>
       <property name="text">
-       <string/>
+       <string>Network mode:</string>
       </property>
       <property name="pixmap">
        <pixmap>:/new/prefix1/globe-no.png</pixmap>
