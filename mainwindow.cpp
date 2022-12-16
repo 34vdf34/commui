@@ -1760,7 +1760,7 @@ void MainWindow::peerLatency()
             border-style: inset; \
         }";
 
-    QStringList peerStatusFileNames = { "/tmp/peer0","/tmp/peer1","/tmp/peer2","/tmp/peer3","/tmp/peer4","/tmp/peer5" };
+    QStringList peerStatusFileNames = { "/tmp/peer0","/tmp/peer1","/tmp/peer2","/tmp/peer3","/tmp/peer4", "/tmp/peer5", "/tmp/peer6", "/tmp/peer7", "/tmp/peer8", "/tmp/peer9" };
 
     for (int i = 0; i < peerStatusFileNames.size(); i++) {
         QString fileName=peerStatusFileNames.at(i).toLocal8Bit().constData();
