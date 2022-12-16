@@ -36,7 +36,7 @@
 #include <QLocale>
 #include <QMessageBox>
 
-#define NODECOUNT               6
+#define NODECOUNT               10
 #define CONNPOINTCOUNT          3
 #define TELEMETRY_FIFO_OUT      "/tmp/telemetry_fifo_out"
 #define TELEMETRY_FIFO_IN       "/tmp/telemetry_fifo_in"
@@ -83,6 +83,10 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
     ui->contact4Selected->setVisible(0);
     ui->contact5Selected->setVisible(0);
     ui->contact6Selected->setVisible(0);
+    ui->contact7Selected->setVisible(0);
+    ui->contact8Selected->setVisible(0);
+    ui->contact9Selected->setVisible(0);
+    ui->contact10Selected->setVisible(0);
     ui->countLabel->setVisible(0);
     ui->imageFrame->setVisible(0);
     ui->pinButton_pwr->setVisible(false);
@@ -271,12 +275,21 @@ void MainWindow::readGpioButtons()
                 ui->contact4Button->setText( m_keyStatusString[3] );
                 ui->contact5Button->setText( m_keyStatusString[4] );
                 ui->contact6Button->setText( m_keyStatusString[5] );
+                ui->contact7Button->setText( m_keyStatusString[6] );
+                ui->contact8Button->setText( m_keyStatusString[7] );
+                ui->contact9Button->setText( m_keyStatusString[8] );
+                ui->contact10Button->setText( m_keyStatusString[9] );
+
                 ui->contact1Button->setStyleSheet(m_otpStatusHighlightStyle);
                 ui->contact2Button->setStyleSheet(m_otpStatusHighlightStyle);
                 ui->contact3Button->setStyleSheet(m_otpStatusHighlightStyle);
                 ui->contact4Button->setStyleSheet(m_otpStatusHighlightStyle);
                 ui->contact5Button->setStyleSheet(m_otpStatusHighlightStyle);
                 ui->contact6Button->setStyleSheet(m_otpStatusHighlightStyle);
+                ui->contact7Button->setStyleSheet(m_otpStatusHighlightStyle);
+                ui->contact8Button->setStyleSheet(m_otpStatusHighlightStyle);
+                ui->contact9Button->setStyleSheet(m_otpStatusHighlightStyle);
+                ui->contact10Button->setStyleSheet(m_otpStatusHighlightStyle);
                 break;
             }
             if (KEY_A == in_ev.code && in_ev.value == 0 ) {
@@ -287,12 +300,20 @@ void MainWindow::readGpioButtons()
                 ui->contact4Button->setText( nodes.node_name[3] );
                 ui->contact5Button->setText( nodes.node_name[4] );
                 ui->contact6Button->setText( nodes.node_name[5] );
+                ui->contact7Button->setText( nodes.node_name[6] );
+                ui->contact8Button->setText( nodes.node_name[7] );
+                ui->contact9Button->setText( nodes.node_name[8] );
+                ui->contact10Button->setText( nodes.node_name[9] );
                 ui->contact1Button->setStyleSheet(m_otpStausNormalStyle);
                 ui->contact2Button->setStyleSheet(m_otpStausNormalStyle);
                 ui->contact3Button->setStyleSheet(m_otpStausNormalStyle);
                 ui->contact4Button->setStyleSheet(m_otpStausNormalStyle);
                 ui->contact5Button->setStyleSheet(m_otpStausNormalStyle);
                 ui->contact6Button->setStyleSheet(m_otpStausNormalStyle);
+                ui->contact7Button->setStyleSheet(m_otpStausNormalStyle);
+                ui->contact8Button->setStyleSheet(m_otpStausNormalStyle);
+                ui->contact9Button->setStyleSheet(m_otpStausNormalStyle);
+                ui->contact10Button->setStyleSheet(m_otpStausNormalStyle);
                 break;
             }
             /* F2 key: beep mute */
@@ -503,6 +524,27 @@ void MainWindow::fifoChanged(const QString & path)
                 connectAsClient(nodes.node_ip[nodeNumber], nodes.node_id[nodeNumber]);
                 ui->contact6Selected->setVisible(1);
           }
+          if( nodeNumber == 6 ) {
+                ui->contact7Selected->setStyleSheet("background-color: lightgreen;");
+                connectAsClient(nodes.node_ip[nodeNumber], nodes.node_id[nodeNumber]);
+                ui->contact7Selected->setVisible(1);
+          }
+          if( nodeNumber == 7 ) {
+                ui->contact8Selected->setStyleSheet("background-color: lightgreen;");
+                connectAsClient(nodes.node_ip[nodeNumber], nodes.node_id[nodeNumber]);
+                ui->contact8Selected->setVisible(1);
+          }
+          if( nodeNumber == 8 ) {
+                ui->contact9Selected->setStyleSheet("background-color: lightgreen;");
+                connectAsClient(nodes.node_ip[nodeNumber], nodes.node_id[nodeNumber]);
+                ui->contact9Selected->setVisible(1);
+          }
+          if( nodeNumber == 9 ) {
+                ui->contact10Selected->setStyleSheet("background-color: lightgreen;");
+                connectAsClient(nodes.node_ip[nodeNumber], nodes.node_id[nodeNumber]);
+                ui->contact10Selected->setVisible(1);
+          }
+
       }
       if( token[1].compare("offline") == 0 )
       {
@@ -535,6 +577,22 @@ void MainWindow::fifoChanged(const QString & path)
             ui->contact6Selected->setVisible(1);
             ui->contact6Selected->setStyleSheet("background-color: red;");
           }
+          if( nodeNumber == 6 ) {
+            ui->contact7Selected->setVisible(1);
+            ui->contact7Selected->setStyleSheet("background-color: red;");
+          }
+          if( nodeNumber == 7 ) {
+            ui->contact8Selected->setVisible(1);
+            ui->contact8Selected->setStyleSheet("background-color: red;");
+          }
+          if( nodeNumber == 8 ) {
+            ui->contact9Selected->setVisible(1);
+            ui->contact9Selected->setStyleSheet("background-color: red;");
+          }
+          if( nodeNumber == 9 ) {
+            ui->contact10Selected->setVisible(1);
+            ui->contact10Selected->setStyleSheet("background-color: red;");
+          }
       }
 
       if( token[1].compare("terminate_ready") == 0 )
@@ -546,6 +604,10 @@ void MainWindow::fifoChanged(const QString & path)
           ui->contact4Selected->setVisible(0);
           ui->contact5Selected->setVisible(0);
           ui->contact6Selected->setVisible(0);
+          ui->contact7Selected->setVisible(0);
+          ui->contact8Selected->setVisible(0);
+          ui->contact9Selected->setVisible(0);
+          ui->contact10Selected->setVisible(0);
           setContactButtons(true);
           ui->answerButton->setEnabled(true);
           ui->answerButton->setVisible(true);
@@ -701,6 +763,11 @@ void MainWindow::setContactButtons(bool state)
     ui->contact4Button->setDisabled(!state);
     ui->contact5Button->setDisabled(!state);
     ui->contact6Button->setDisabled(!state);
+    ui->contact7Button->setDisabled(!state);
+    ui->contact8Button->setDisabled(!state);
+    ui->contact9Button->setDisabled(!state);
+    ui->contact10Button->setDisabled(!state);
+
     /* If button's are enabled, disable 'own' button */
     int myOwnNodeId;
     for (int x=0; x < NODECOUNT; x++ ) {
@@ -720,6 +787,14 @@ void MainWindow::setContactButtons(bool state)
              ui->contact5Button->setDisabled(true);
          if ( x == 5 )
              ui->contact6Button->setDisabled(true);
+         if ( x == 6 )
+             ui->contact7Button->setDisabled(true);
+         if ( x == 7 )
+             ui->contact8Button->setDisabled(true);
+         if ( x == 8 )
+             ui->contact9Button->setDisabled(true);
+         if ( x == 9 )
+             ui->contact10Button->setDisabled(true);
         }
     }
 }
@@ -732,6 +807,10 @@ void MainWindow::setIndicatorForIncomingConnection(QString peerIp)
         ui->contact4Selected->setVisible(0);
         ui->contact5Selected->setVisible(0);
         ui->contact6Selected->setVisible(0);
+        ui->contact7Selected->setVisible(0);
+        ui->contact8Selected->setVisible(0);
+        ui->contact9Selected->setVisible(0);
+        ui->contact10Selected->setVisible(0);
         /* Disable contact buttons when incoming connection is alive */
         setContactButtons(false);
         /* Light up 'green' for contact, who made connection */
@@ -758,6 +837,18 @@ void MainWindow::setIndicatorForIncomingConnection(QString peerIp)
         }
         if( nodeNumber == 5 ) {
             ui->contact6Selected->setVisible(1);
+        }
+        if( nodeNumber == 6 ) {
+            ui->contact7Selected->setVisible(1);
+        }
+        if( nodeNumber == 7 ) {
+            ui->contact8Selected->setVisible(1);
+        }
+        if( nodeNumber == 8 ) {
+            ui->contact9Selected->setVisible(1);
+        }
+        if( nodeNumber == 9 ) {
+            ui->contact10Selected->setVisible(1);
         }
 }
 
@@ -799,6 +890,12 @@ void MainWindow::loadSettings()
     ui->contact5Button->setText( nodes.node_name[4] );
     ui->contact6Button->setText( nodes.node_name[5] );
 
+    /* TODO THIS After INI files are formed right: */
+    ui->contact7Button->setText( nodes.node_name[6] );
+    ui->contact8Button->setText( nodes.node_name[7] );
+    ui->contact9Button->setText( nodes.node_name[8] );
+    ui->contact10Button->setText( nodes.node_name[9] );
+
     /* Disable my own contact button */
     for (int x=0; x < NODECOUNT; x++ ) {
 
@@ -818,6 +915,15 @@ void MainWindow::loadSettings()
                  ui->contact5Button->setDisabled(true);
              if ( x == 5 )
                  ui->contact6Button->setDisabled(true);
+             if ( x == 6 )
+                 ui->contact7Button->setDisabled(true);
+             if ( x == 7 )
+                 ui->contact8Button->setDisabled(true);
+             if ( x == 8 )
+                 ui->contact9Button->setDisabled(true);
+             if ( x == 9 )
+                 ui->contact10Button->setDisabled(true);
+
          }
     }
     /* Get connection profile from INI file */
@@ -1026,6 +1132,10 @@ void MainWindow::on_redButton_clicked()
     ui->contact4Selected->setVisible(0);
     ui->contact5Selected->setVisible(0);
     ui->contact6Selected->setVisible(0);
+    ui->contact7Selected->setVisible(0);
+    ui->contact8Selected->setVisible(0);
+    ui->contact9Selected->setVisible(0);
+    ui->contact10Selected->setVisible(0);
     // setContactButtons(true);
 
     if ( g_connectState )
@@ -1112,6 +1222,31 @@ void MainWindow::on_contact6Button_clicked()
     QString scanCmd = nodes.node_ip[5] + ",status";
     fifoWrite(scanCmd);
 }
+
+void MainWindow::on_contact7Button_clicked()
+{
+    QString scanCmd = nodes.node_ip[6] + ",status";
+    fifoWrite(scanCmd);
+}
+
+void MainWindow::on_contact8Button_clicked()
+{
+    QString scanCmd = nodes.node_ip[7] + ",status";
+    fifoWrite(scanCmd);
+}
+
+void MainWindow::on_contact9Button_clicked()
+{
+    QString scanCmd = nodes.node_ip[8] + ",status";
+    fifoWrite(scanCmd);
+}
+
+void MainWindow::on_contact10Button_clicked()
+{
+    QString scanCmd = nodes.node_ip[9] + ",status";
+    fifoWrite(scanCmd);
+}
+
 
 void MainWindow::on_volumeSlider_valueChanged(int value)
 {
@@ -1552,39 +1687,7 @@ void MainWindow::on_pinButton_pwr_clicked()
 /* Read dpinger service output file with timer */
 void MainWindow::networkLatency()
 {
-    // DEV SUPPORT:
-    ui->contact1Selected->setVisible(0);
-    ui->contact1Selected->setStyleSheet("background-color: lightgreen;");
-
-    ui->contact2Selected->setVisible(1);
-    ui->contact2Selected->setStyleSheet("background-color: lightgreen;");
-
-    ui->contact3Selected->setVisible(0);
-    ui->contact3Selected->setStyleSheet("background-color: lightgreen;");
-
-    ui->contact4Selected->setVisible(0);
-    ui->contact4Selected->setStyleSheet("background-color: lightgreen;");
-
-    ui->contact5Selected->setVisible(0);
-    ui->contact5Selected->setStyleSheet("background-color: lightgreen;");
-
-    ui->contact6Selected->setVisible(0);
-    ui->contact6Selected->setStyleSheet("background-color: lightgreen;");
-
-    ui->contact7Selected->setVisible(0);
-    ui->contact7Selected->setStyleSheet("background-color: lightgreen;");
-
-    ui->contact8Selected->setVisible(0);
-    ui->contact8Selected->setStyleSheet("background-color: lightgreen;");
-
-    ui->contact9Selected->setVisible(0);
-    ui->contact9Selected->setStyleSheet("background-color: lightgreen;");
-
-    ui->contact10Selected->setVisible(0);
-    ui->contact10Selected->setStyleSheet("background-color: lightgreen;");
-
-
-    QString networkStatusFile="/tmp/network";
+   QString networkStatusFile="/tmp/network";
     QFile networkFile(networkStatusFile);
     if(!networkFile.exists()){
         qDebug() << "Error, no file: " << networkStatusFile;
@@ -1710,6 +1813,27 @@ void MainWindow::peerLatency()
     } else {
         ui->contact6Button->setStyleSheet(normalStyle);
     }
+
+        if ( m_peerLatencyValue[6].toInt() > 0 ) {
+            ui->contact7Button->setStyleSheet(highlightStyle);
+        } else {
+            ui->contact7Button->setStyleSheet(normalStyle);
+        }
+        if ( m_peerLatencyValue[7].toInt() > 0 ) {
+            ui->contact8Button->setStyleSheet(highlightStyle);
+        } else {
+            ui->contact8Button->setStyleSheet(normalStyle);
+        }
+        if ( m_peerLatencyValue[8].toInt() > 0 ) {
+            ui->contact9Button->setStyleSheet(highlightStyle);
+        } else {
+            ui->contact9Button->setStyleSheet(normalStyle);
+        }
+        if ( m_peerLatencyValue[9].toInt() > 0 ) {
+            ui->contact10Button->setStyleSheet(highlightStyle);
+        } else {
+            ui->contact10Button->setStyleSheet(normalStyle);
+        }
 }
 
 /* This function will read key file lenghts and counter values of each key.

@@ -30,7 +30,7 @@
 #include <QTimer>
 #include <QProcess>
 
-#define NODECOUNT 6
+#define NODECOUNT 10
 #define CONNPOINTCOUNT 3
 #define UI_MODE 0
 #define VAULT_MODE 1
@@ -61,6 +61,10 @@ private slots:
     void on_contact4Button_clicked();
     void on_contact5Button_clicked();
     void on_contact6Button_clicked();
+    void on_contact7Button_clicked();
+    void on_contact8Button_clicked();
+    void on_contact9Button_clicked();
+    void on_contact10Button_clicked();
     void fifoChanged(const QString & path);
     void fifoWrite(QString message);
     void readGpioButtons();

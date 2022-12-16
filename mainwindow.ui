@@ -713,7 +713,7 @@ border-radius: 4px;
     <property name="geometry">
      <rect>
       <x>1202</x>
-      <y>20</y>
+      <y>10</y>
       <width>66</width>
       <height>18</height>
      </rect>
@@ -721,14 +721,14 @@ border-radius: 4px;
     <property name="font">
      <font>
       <pointsize>-1</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true"> color: green;
-    font:  bold 24px;</string>
+    font:  24px;</string>
     </property>
     <property name="text">
      <string>VOL</string>
@@ -3084,7 +3084,7 @@ QPushButton#route1Button:checkked {
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">QLabel#contact6Selected{
+     <string notr="true">QLabel#contact8Selected{
     background-color: lightgreen;
     border-style: outset;
     border-width: 0px;
@@ -3161,7 +3161,7 @@ QPushButton#route1Button:checkked {
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">QLabel#contact6Selected{
+     <string notr="true">QLabel#contact9Selected{
     background-color: lightgreen;
     border-style: outset;
     border-width: 0px;
@@ -3238,7 +3238,7 @@ QPushButton#route1Button:checkked {
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">QLabel#contact6Selected{
+     <string notr="true">QLabel#contact10Selected{
     background-color: lightgreen;
     border-style: outset;
     border-width: 0px;
