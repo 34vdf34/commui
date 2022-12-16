@@ -2627,7 +2627,7 @@ QPushButton#route1Button:checkked {
 </string>
       </property>
       <property name="text">
-       <string>Network mode:</string>
+       <string/>
       </property>
       <property name="pixmap">
        <pixmap>:/new/prefix1/globe-no.png</pixmap>
@@ -2636,41 +2636,12 @@ QPushButton#route1Button:checkked {
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="versionLabel">
-      <property name="geometry">
-       <rect>
-        <x>660</x>
-        <y>550</y>
-        <width>450</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">    background-color: transparent;
-    border-width: 0px;
-    color: green;
-    font:  28px;
-    min-width: 1em;
-    padding: 6px;
-
-</string>
-      </property>
-      <property name="text">
-       <string>v0.1</string>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-      </property>
-     </widget>
     </widget>
     <widget class="QLabel" name="logoLabel">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>230</y>
+       <y>220</y>
        <width>450</width>
        <height>450</height>
       </rect>
@@ -2696,6 +2667,35 @@ QPushButton#route1Button:checkked {
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="versionLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>680</y>
+       <width>450</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">    background-color: transparent;
+    border-width: 0px;
+    color: green;
+    font:  28px;
+    min-width: 1em;
+    padding: 6px;
+
+</string>
+     </property>
+     <property name="text">
+      <string>v0.1</string>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
    </widget>
