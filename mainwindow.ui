@@ -183,9 +183,9 @@ QPushButton#route1Button:checkked {
     <property name="geometry">
      <rect>
       <x>780</x>
-      <y>350</y>
-      <width>191</width>
-      <height>15</height>
+      <y>160</y>
+      <width>190</width>
+      <height>10</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -210,9 +210,9 @@ QPushButton#route1Button:checkked {
     <property name="geometry">
      <rect>
       <x>780</x>
-      <y>230</y>
-      <width>191</width>
-      <height>15</height>
+      <y>70</y>
+      <width>190</width>
+      <height>10</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -237,9 +237,9 @@ QPushButton#route1Button:checkked {
     <property name="geometry">
      <rect>
       <x>780</x>
-      <y>150</y>
-      <width>191</width>
-      <height>71</height>
+      <y>10</y>
+      <width>190</width>
+      <height>60</height>
      </rect>
     </property>
     <property name="font">
@@ -489,9 +489,9 @@ QPushButton#route1Button:checkked {
     <property name="geometry">
      <rect>
       <x>780</x>
-      <y>270</y>
-      <width>191</width>
-      <height>71</height>
+      <y>100</y>
+      <width>190</width>
+      <height>60</height>
      </rect>
     </property>
     <property name="font">
@@ -558,9 +558,9 @@ QPushButton#route1Button:checkked {
     <property name="geometry">
      <rect>
       <x>780</x>
-      <y>390</y>
-      <width>191</width>
-      <height>71</height>
+      <y>190</y>
+      <width>190</width>
+      <height>70</height>
      </rect>
     </property>
     <property name="font">
@@ -608,9 +608,9 @@ QPushButton#route1Button:checkked {
     <property name="geometry">
      <rect>
       <x>780</x>
-      <y>470</y>
-      <width>191</width>
-      <height>15</height>
+      <y>250</y>
+      <width>190</width>
+      <height>10</height>
      </rect>
     </property>
     <property name="styleSheet">

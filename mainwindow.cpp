@@ -1552,6 +1552,26 @@ void MainWindow::on_pinButton_pwr_clicked()
 /* Read dpinger service output file with timer */
 void MainWindow::networkLatency()
 {
+    // DEV SUPPORT:
+    ui->contact1Selected->setVisible(1);
+    ui->contact1Selected->setStyleSheet("background-color: lightgreen;");
+
+    ui->contact2Selected->setVisible(1);
+    ui->contact2Selected->setStyleSheet("background-color: lightgreen;");
+
+    ui->contact3Selected->setVisible(1);
+    ui->contact3Selected->setStyleSheet("background-color: lightgreen;");
+
+    ui->contact4Selected->setVisible(1);
+    ui->contact4Selected->setStyleSheet("background-color: lightgreen;");
+
+    ui->contact5Selected->setVisible(1);
+    ui->contact5Selected->setStyleSheet("background-color: lightgreen;");
+
+    ui->contact6Selected->setVisible(1);
+    ui->contact6Selected->setStyleSheet("background-color: lightgreen;");
+
+
     QString networkStatusFile="/tmp/network";
     QFile networkFile(networkStatusFile);
     if(!networkFile.exists()){
