@@ -144,9 +144,9 @@ private slots:
     void tearDownLocal();
     int waitForFifoReply();
     int checkFifoReplyTimeout();
-
-
     void on_audioDeviceInput_textChanged(const QString &arg1);
+    void resetF1State();
+    void changeCallSign(int index);
 
 private:
     Ui::MainWindow *ui;
@@ -229,7 +229,7 @@ private:
     QString m_keyPersentage_outcount[NODECOUNT];
     QString m_keyStatusString[NODECOUNT];
     QString m_peerLatencyValue[NODECOUNT];
-
+    bool    m_f1WasDown=false;
 
 
     /* Button Styles */
@@ -403,6 +403,26 @@ private:
                 border-style: inset; \
             }";
 
+            QString m_editCallSignStyle = " \
+                QLabel{width:350 px; font-size: 30px; color: lightgreen; background-color: rgb(0, 0, 0); } \
+                QInputDialog { background-color: rgb(0, 0, 0); border: 5px solid green; } \
+                QLineEdit { color: lightgreen; background-color: transparent; border-color: green; border-style:solid; border-width: 2 px; }\
+                QPushButton { \
+                    background-color: transparent; \
+                    border-style: outset; \
+                    border-width: 2px; \
+                    border-radius: 10px; \
+                    border-color: green; \
+                    color: green; \
+                    font: bold 32px; \
+                    min-width: 5em; \
+                    min-height: 2em; \
+                    padding: 6px; \
+                } \
+                QPushButton:pressed { \
+                    background-color: rgb(0,224, 0); \
+                    border-style: inset; \
+                }";
 
 };
 #endif // MAINWINDOW_H

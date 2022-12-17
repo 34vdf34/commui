@@ -35,6 +35,7 @@
 #include <linux/input.h>
 #include <QLocale>
 #include <QMessageBox>
+#include <QInputDialog>
 
 #define NODECOUNT               10
 #define CONNPOINTCOUNT          3
@@ -252,7 +253,9 @@ void MainWindow::rxKeyPresentageChanged()
     if ( rxKeyRemainingString != "100.00" )
         ui->keyPrecentage->setText( txKeyRemainingString + " % " + rxKeyRemainingString + " %" );
 }
-
+void MainWindow::resetF1State() {
+    m_f1WasDown = false;
+}
 void MainWindow::readGpioButtons()
 {
     struct input_event in_ev = { 0 };
@@ -267,6 +270,8 @@ void MainWindow::readGpioButtons()
         {
             /* F1 key: OTP status display */
             if (KEY_A == in_ev.code && in_ev.value == 1 ) {
+                m_f1WasDown = true;
+                QTimer::singleShot(2000, this, SLOT( resetF1State()) );
                 ui->lineEdit->clearFocus();
                 reloadKeyUsage();
                 ui->contact1Button->setText( m_keyStatusString[0] );
@@ -1187,64 +1192,131 @@ void MainWindow::on_route3Button_clicked()
     ui->route3Selected->setVisible(1);
 }
 
+void MainWindow::changeCallSign(int index)
+{
+    QInputDialog inputBox;
+    inputBox.setLabelText("Change call sign:");
+    inputBox.setStyleSheet( m_editCallSignStyle );
+    int ret = inputBox.exec();
+    if ( ret == QDialog::Accepted ) {
+        QString newCallSign = inputBox.textValue();
+        if ( newCallSign.length() > 2 && newCallSign.length() < 10 ) {
+            QString nodeName="node_name_" + QString::number(index);
+            QSettings settings(SETTINGS_INI_FILE,QSettings::IniFormat);
+            settings.setValue(nodeName, newCallSign );
+            loadSettings();
+        }
+    }
+}
+
 void MainWindow::on_contact1Button_clicked()
 {
-    QString scanCmd = nodes.node_ip[0] + ",status";
-    fifoWrite(scanCmd);
+    if ( m_f1WasDown )
+    {
+        changeCallSign(0);
+    } else {
+        QString scanCmd = nodes.node_ip[0] + ",status";
+        fifoWrite(scanCmd);
+    }
 }
 
 void MainWindow::on_contact2Button_clicked()
 {
-    QString scanCmd = nodes.node_ip[1] + ",status";
-    fifoWrite(scanCmd);
+    if ( m_f1WasDown )
+    {
+        changeCallSign(1);
+    } else {
+        QString scanCmd = nodes.node_ip[1] + ",status";
+        fifoWrite(scanCmd);
+    }
 }
 
 void MainWindow::on_contact3Button_clicked()
 {
-    QString scanCmd = nodes.node_ip[2] + ",status";
-    fifoWrite(scanCmd);
+    if ( m_f1WasDown )
+    {
+        changeCallSign(2);
+    } else {
+        QString scanCmd = nodes.node_ip[2] + ",status";
+        fifoWrite(scanCmd);
+    }
 }
 
 void MainWindow::on_contact4Button_clicked()
 {
-    QString scanCmd = nodes.node_ip[3] + ",status";
-    fifoWrite(scanCmd);
+    if ( m_f1WasDown )
+    {
+        changeCallSign(3);
+    } else {
+        QString scanCmd = nodes.node_ip[3] + ",status";
+        fifoWrite(scanCmd);
+    }
 }
 
 void MainWindow::on_contact5Button_clicked()
 {
-    QString scanCmd = nodes.node_ip[4] + ",status";
-    fifoWrite(scanCmd);
+    if ( m_f1WasDown )
+    {
+        changeCallSign(4);
+    } else {
+        QString scanCmd = nodes.node_ip[4] + ",status";
+        fifoWrite(scanCmd);
+    }
 }
 
 void MainWindow::on_contact6Button_clicked()
 {
-    QString scanCmd = nodes.node_ip[5] + ",status";
-    fifoWrite(scanCmd);
+    if ( m_f1WasDown )
+    {
+        changeCallSign(5);
+    } else {
+        QString scanCmd = nodes.node_ip[5] + ",status";
+        fifoWrite(scanCmd);
+    }
 }
 
 void MainWindow::on_contact7Button_clicked()
 {
-    QString scanCmd = nodes.node_ip[6] + ",status";
-    fifoWrite(scanCmd);
+    if ( m_f1WasDown )
+    {
+        changeCallSign(6);
+    } else {
+        QString scanCmd = nodes.node_ip[6] + ",status";
+        fifoWrite(scanCmd);
+    }
 }
 
 void MainWindow::on_contact8Button_clicked()
 {
-    QString scanCmd = nodes.node_ip[7] + ",status";
-    fifoWrite(scanCmd);
+    if ( m_f1WasDown )
+    {
+        changeCallSign(7);
+    } else {
+        QString scanCmd = nodes.node_ip[7] + ",status";
+        fifoWrite(scanCmd);
+    }
 }
 
 void MainWindow::on_contact9Button_clicked()
 {
-    QString scanCmd = nodes.node_ip[8] + ",status";
-    fifoWrite(scanCmd);
+    if ( m_f1WasDown )
+    {
+        changeCallSign(8);
+    } else {
+        QString scanCmd = nodes.node_ip[8] + ",status";
+        fifoWrite(scanCmd);
+    }
 }
 
 void MainWindow::on_contact10Button_clicked()
 {
-    QString scanCmd = nodes.node_ip[9] + ",status";
-    fifoWrite(scanCmd);
+    if ( m_f1WasDown )
+    {
+        changeCallSign(9);
+    } else {
+        QString scanCmd = nodes.node_ip[9] + ",status";
+        fifoWrite(scanCmd);
+    }
 }
 
 
