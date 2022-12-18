@@ -147,7 +147,7 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
             qDebug() << "MSG FIFO ERROR:" << msgFifoIn.errorString();
         }
 
-        /* Initial volume */
+        /* Initial volume(s) */
         ui->volumeSlider->setValue(uPref.volumeValue.toInt());
         if ( uPref.volumeValue == "" ) {
             uPref.volumeValue = "50";
@@ -999,18 +999,27 @@ void MainWindow::saveAndActivateConnectionProfile(QString profile)
 
 /*
  * Set system volume with external process.
- * Only playback volume is adjusted.
+ * Playback volume:     amixer sset [DEVICENAME] Playback 100%
+ * Microphone volume:   amixer sset [DEVICENAME] Capture 5%+
  */
 void MainWindow::setSystemVolume(int volume)
 {
-    /* Playback volume:     amixer sset [DEVICENAME] Playback 100%
-       Microphone volume:   amixer sset [DEVICENAME] Capture 5%+ */
-
     QString volumePercentString = QString::number(volume) + "%";
     qint64 pid;
     QProcess process;
     process.setProgram("/usr/bin/amixer");
-    process.setArguments({"sset","'"+uiElement.audioMixerOutputDevice+"'",volumePercentString});
+    process.setArguments({"sset","'"+uiElement.audioMixerOutputDevice+"'", "Playback",volumePercentString});
+    process.setStandardOutputFile(QProcess::nullDevice());
+    process.setStandardErrorFile(QProcess::nullDevice());
+    process.startDetached(&pid);
+}
+void MainWindow::setMicrophoneVolume(int volume)
+{
+    QString volumePercentString = QString::number(volume) + "%";
+    qint64 pid;
+    QProcess process;
+    process.setProgram("/usr/bin/amixer");
+    process.setArguments({"sset","'"+uiElement.audioMixerOutputDevice+"'", "Capture", volumePercentString });
     process.setStandardOutputFile(QProcess::nullDevice());
     process.setStandardErrorFile(QProcess::nullDevice());
     process.startDetached(&pid);
@@ -1020,7 +1029,6 @@ void MainWindow::loadUserPreferences()
 {
     QSettings settings(USER_PREF_INI_FILE,QSettings::IniFormat);
     uPref.volumeValue = settings.value("volume","70").toString();
-    setSystemVolume( uPref.volumeValue.toInt() );
     nodes.beepActive = settings.value("beep").toString();
     uPref.m_pinCode = settings.value("pincode","1234").toString();
     uPref.m_settingsPinCode = settings.value("settings_pincode","4321").toString();
@@ -1031,12 +1039,15 @@ void MainWindow::loadUserPreferences()
     if ( uPref.m_autoerase == "false") {
         ui->autoeraseCheckbox->setChecked(false);
     }
+    uPref.m_micVolume = settings.value("micvolume","90").toString();
+
 }
 void MainWindow::saveUserPreferences()
 {
     QSettings settings(USER_PREF_INI_FILE,QSettings::IniFormat);
     settings.setValue("volume", uPref.volumeValue);
     setSystemVolume( uPref.volumeValue.toInt() );
+    setMicrophoneVolume(uPref.m_micVolume.toInt());
 }
 
 void MainWindow::saveUserPreferencesBeep(QString value)
@@ -2382,5 +2393,25 @@ void MainWindow::on_audioDeviceInput_textChanged(const QString &arg1)
     QSettings settings(UI_ELEMENTS_INI_FILE,QSettings::IniFormat);
     settings.setValue("audio_device", arg1 );
     uiElement.audioMixerOutputDevice = arg1;
+}
+
+
+void MainWindow::on_micVolButton_clicked()
+{
+    QInputDialog inputBox;
+    inputBox.setLabelText("Mic capture value (0-100):");
+    inputBox.setStyleSheet( m_editCallSignStyle );
+    inputBox.setTextValue(uPref.m_micVolume);
+    int ret = inputBox.exec();
+    if ( ret == QDialog::Accepted ) {
+        int volumeValue = inputBox.textValue().toInt();
+        if ( volumeValue > 0 && volumeValue <= 100 ) {
+            setMicrophoneVolume(volumeValue);
+            uPref.m_micVolume = QString::number(volumeValue);
+            QSettings settings(USER_PREF_INI_FILE,QSettings::IniFormat);
+            settings.setValue("micvolume", uPref.m_micVolume);
+            ui->WifistatusLabel->setText("Capture volume set & saved: " + uPref.m_micVolume + " %" );
+        }
+    }
 }
 

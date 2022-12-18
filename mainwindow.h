@@ -147,6 +147,8 @@ private slots:
     void on_audioDeviceInput_textChanged(const QString &arg1);
     void resetF1State();
     void changeCallSign(int index);
+    void on_micVolButton_clicked();
+    void setMicrophoneVolume(int volume);
 
 private:
     Ui::MainWindow *ui;
@@ -183,6 +185,7 @@ private:
         QString m_pinCode;
         QString m_settingsPinCode;
         QString m_autoerase;
+        QString m_micVolume;
     };
     UserPreferences uPref;
     void loadUserPreferences();
