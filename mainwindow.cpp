@@ -1019,7 +1019,7 @@ void MainWindow::setMicrophoneVolume(int volume)
     qint64 pid;
     QProcess process;
     process.setProgram("/usr/bin/amixer");
-    process.setArguments({"sset","'"+uiElement.audioMixerOutputDevice+"'", "Capture", volumePercentString });
+    process.setArguments({"sset","'"+uiElement.audioMixerInputDevice+"'", "Capture", volumePercentString });
     process.setStandardOutputFile(QProcess::nullDevice());
     process.setStandardErrorFile(QProcess::nullDevice());
     process.startDetached(&pid);
@@ -1073,7 +1073,8 @@ void MainWindow::loadUserInterfacePreferences()
     uiElement.pinEntryTitleVaultChecking = settings.value("pintitle_vault_check","Checking...").toString();
     uiElement.pinEntryTitleAccessPin = settings.value("pintitle_access","Set calibration data:").toString();
     uiElement.cameraButtonVisible = settings.value("cam_enabled",false).toBool();
-    uiElement.audioMixerOutputDevice = settings.value("audio_device","PCM").toString();
+    uiElement.audioMixerOutputDevice = settings.value("audio_device","Headset").toString();
+    uiElement.audioMixerInputDevice = settings.value("audio_mic_device","Headset").toString();
     ui->systemNameLabel->setText(uiElement.systemName);
     ui->messagingTitle->setText(uiElement.messagingTitle);
     ui->commCheckButton->setText(uiElement.commCheckButton);
@@ -1082,14 +1083,13 @@ void MainWindow::loadUserInterfacePreferences()
     ui->redButton->setText(uiElement.terminateSecureButton);
     ui->pinEntryTitle->setText(uiElement.pinEntryTitleAccessPin);
     ui->audioDeviceInput->setText(uiElement.audioMixerOutputDevice);
-
+    ui->audioDeviceMicInputName->setText(uiElement.audioMixerInputDevice);
     if ( uiElement.cameraButtonVisible ) {
         ui->camButton->setVisible(1);
     } else {
         ui->camButton->setVisible(0);
     }
 }
-
 
 /* Timeout for FIFO replies */
 int MainWindow::waitForFifoReply() {
@@ -2413,5 +2413,13 @@ void MainWindow::on_micVolButton_clicked()
             ui->WifistatusLabel->setText("Capture volume set & saved: " + uPref.m_micVolume + " %" );
         }
     }
+}
+
+
+void MainWindow::on_audioDeviceMicInputName_textChanged(const QString &arg1)
+{
+    QSettings settings(UI_ELEMENTS_INI_FILE,QSettings::IniFormat);
+    settings.setValue("audio_mic_device", arg1 );
+    uiElement.audioMixerInputDevice = arg1;
 }
 

@@ -150,6 +150,8 @@ private slots:
     void on_micVolButton_clicked();
     void setMicrophoneVolume(int volume);
 
+    void on_audioDeviceMicInputName_textChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
     QFileSystemWatcher * watcher;
@@ -211,6 +213,7 @@ private:
         QString pinEntryTitleAccessPin;
         bool cameraButtonVisible;
         QString audioMixerOutputDevice;
+        QString audioMixerInputDevice;
     };
     uiStrings uiElement;
     void loadUserInterfacePreferences();

@@ -2349,7 +2349,7 @@ font:   30px;</string>
        <rect>
         <x>30</x>
         <y>360</y>
-        <width>371</width>
+        <width>180</width>
         <height>61</height>
        </rect>
       </property>
@@ -2378,7 +2378,7 @@ font:   30px;</string>
        <rect>
         <x>10</x>
         <y>300</y>
-        <width>600</width>
+        <width>180</width>
         <height>41</height>
        </rect>
       </property>
@@ -2391,7 +2391,7 @@ font:   30px;</string>
 </string>
       </property>
       <property name="text">
-       <string>Mixer device name:</string>
+       <string>SPK Mixer</string>
       </property>
      </widget>
      <widget class="QLabel" name="route1Selected">
@@ -2627,7 +2627,7 @@ QPushButton#route1Button:checkked {
 </string>
       </property>
       <property name="text">
-       <string>Network mode:</string>
+       <string/>
       </property>
       <property name="pixmap">
        <pixmap>:/new/prefix1/globe-no.png</pixmap>
@@ -2676,6 +2676,56 @@ QPushButton:pressed {
       </property>
       <property name="text">
        <string>Mic level</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="audioDeviceMicInputName">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>360</y>
+        <width>180</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background: rgba(0, 0, 0,200);
+border-style: outset;
+border-width: 2px;
+border-radius: 2px;
+border-color: green;
+color: lightgreen;
+padding: 5px;
+font:   30px;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="maxLength">
+       <number>190</number>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="generalSettingsLabelMicAudio">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>300</y>
+        <width>180</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">    background-color: transparent;
+   color: green;
+    font:   32px;
+    min-width: 1em;
+    padding: 3px;
+</string>
+      </property>
+      <property name="text">
+       <string>MIC Mixer</string>
       </property>
      </widget>
     </widget>
