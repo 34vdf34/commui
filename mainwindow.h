@@ -357,8 +357,8 @@ private:
             border-width: 2px; \
             border-radius: 10px; \
             border-color: green; \
-           color: green; \
-            font: bold 30px; \
+            color: green; \
+            font: 30px; \
             min-width: 1em; \
             padding: 6px; \
         } \
