@@ -1003,7 +1003,7 @@ void MainWindow::saveAndActivateConnectionProfile(QString profile)
  */
 void MainWindow::setSystemVolume(int volume)
 {
-    /* Playback volume:     amixer sset [DEVICENAME] 100%
+    /* Playback volume:     amixer sset [DEVICENAME] Playback 100%
        Microphone volume:   amixer sset [DEVICENAME] Capture 5%+ */
 
     QString volumePercentString = QString::number(volume) + "%";
