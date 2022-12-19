@@ -178,6 +178,9 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
         connect(screenBlanktimer, SIGNAL(timeout()), this, SLOT(rampDown()) );
         rampUp();
         backLightOn = true;
+        staGreenLedOff();
+        staRedLedOff();
+        usrLedOff();
 
         /* Enable route buttons */
         ui->route1Button->setEnabled(true);
