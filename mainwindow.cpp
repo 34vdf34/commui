@@ -44,6 +44,9 @@
 #define GPIO_INPUT_PATH         "/dev/input/by-path/platform-gpio_keys-event"
 #define BACKLIGHT_PATH          "/sys/devices/platform/soc/fe804000.i2c/i2c-1/1-0045/backlight/1-0045/brightness"
 #define BUZZER_PATH             "/sys/class/leds/usr_buzzer/brightness"
+#define USR_LED_GREEN_PATH      "/sys/class/leds/usr_led0/brightness"
+#define STA_LED_RED_PATH        "/sys/class/leds/usr_led1/brightness"
+#define STA_LED_GREEN_PATH      "/sys/class/leds/usr_led2/brightness"
 #define SETTINGS_INI_FILE       "/opt/tunnel/sinm.ini"
 #define USER_PREF_INI_FILE      "/opt/tunnel/userpreferences.ini"
 #define UI_ELEMENTS_INI_FILE    "/opt/tunnel/userinterface.ini"
@@ -61,6 +64,7 @@
 #define SUBSTITUTE_CHAR_CODE    24
 #define FIFO_TIMEOUT            1
 #define FIFO_REPLY_RECEIVED     0
+#define LED_PULSE_MS            500
 
 /* Global fifoIn file handle */
 QFile fifoIn(TELEMETRY_FIFO_OUT);
@@ -100,7 +104,7 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
         ui->logoLabel->setPixmap(QPixmap(logoGraphFile));
 
     /* Set version string */
-    ui->versionLabel->setText("v0.31 (10)");
+    ui->versionLabel->setText("v0.32 (10)");
 
     if ( argumentValue == VAULT_MODE ) {
         m_startMode = VAULT_MODE;
@@ -392,6 +396,65 @@ void MainWindow::readGpioButtons()
             }
         }
     }
+}
+
+void MainWindow::usrLedOn()
+{
+    QFile file(USR_LED_GREEN_PATH);
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream << 1 << Qt::endl;
+    }
+    file.close();
+}
+/*  STA led is connection latency indicator
+    USR led is unused */
+void MainWindow::usrLedOff()
+{
+    QFile file(USR_LED_GREEN_PATH);
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream << 0 << Qt::endl;
+    }
+    file.close();
+}
+void MainWindow::staRedLedOn()
+{
+    QFile file(STA_LED_RED_PATH);
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream << 1 << Qt::endl;
+    }
+    file.close();
+    QTimer::singleShot(LED_PULSE_MS, this, SLOT( staRedLedOff() ) );
+}
+void MainWindow::staRedLedOff()
+{
+    QFile file(STA_LED_RED_PATH);
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream << 0 << Qt::endl;
+    }
+    file.close();
+}
+void MainWindow::staGreenLedOn()
+{
+    QFile file(STA_LED_GREEN_PATH);
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream << 1 << Qt::endl;
+    }
+    file.close();
+    QTimer::singleShot(LED_PULSE_MS, this, SLOT( staGreenLedOff() ) );
+}
+void MainWindow::staGreenLedOff()
+{
+    QFile file(STA_LED_GREEN_PATH);
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream << 0 << Qt::endl;
+    }
+    file.close();
 }
 
 void MainWindow::beepBuzzerOff()
@@ -1787,18 +1850,23 @@ void MainWindow::networkLatency()
         int latencyIntms = networkElements[0].toInt()/1000;
         QString indicateValue = QString::number(latencyIntms) + " ms";
         ui->networkLatencyLabel->setText(indicateValue);
-        /* Set color */
+        /* Set UI color & STA led */
         if ( latencyIntms < 200 ) {
             ui->networkLatencyLabel->setStyleSheet("color: lightgreen;");
+            staGreenLedOn();
         }
         if ( latencyIntms == 0 ) {
             ui->networkLatencyLabel->setStyleSheet("color: '#FF5555';");
+            staRedLedOn();
         }
-        if ( latencyIntms > 200 ) {
+        if ( latencyIntms > 200 && latencyIntms < 1000) {
             ui->networkLatencyLabel->setStyleSheet("color: yellow;");
+            staGreenLedOn();
+            staRedLedOn();
         }
         if ( latencyIntms > 1000 ) {
             ui->networkLatencyLabel->setStyleSheet("color: '#FF5555';");
+            staRedLedOn();
         }
     }
     peerLatency();

@@ -49,7 +49,6 @@ public:
     ~MainWindow();
 
 private slots:
-
     void on_greenButton_clicked();
     void on_redButton_clicked();
     void on_route1Button_clicked();
@@ -149,8 +148,13 @@ private slots:
     void changeCallSign(int index);
     void on_micVolButton_clicked();
     void setMicrophoneVolume(int volume);
-
     void on_audioDeviceMicInputName_textChanged(const QString &arg1);
+    void usrLedOn();
+    void usrLedOff();
+    void staRedLedOn();
+    void staRedLedOff();
+    void staGreenLedOn();
+    void staGreenLedOff();
 
 private:
     Ui::MainWindow *ui;
