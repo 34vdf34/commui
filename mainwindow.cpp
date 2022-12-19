@@ -104,7 +104,11 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
         ui->logoLabel->setPixmap(QPixmap(logoGraphFile));
 
     /* Set version string */
-    ui->versionLabel->setText("v0.32 (10)");
+    QString sshStatus="";
+    if ( checkSshProcess() ) {
+        sshStatus = "[development]";
+    }
+    ui->versionLabel->setText("v0.33 (10) " + sshStatus);
 
     if ( argumentValue == VAULT_MODE ) {
         m_startMode = VAULT_MODE;
@@ -2466,7 +2470,6 @@ void MainWindow::on_audioDeviceInput_textChanged(const QString &arg1)
     uiElement.audioMixerOutputDevice = arg1;
 }
 
-
 void MainWindow::on_micVolButton_clicked()
 {
     QInputDialog inputBox;
@@ -2486,11 +2489,21 @@ void MainWindow::on_micVolButton_clicked()
     }
 }
 
-
 void MainWindow::on_audioDeviceMicInputName_textChanged(const QString &arg1)
 {
     QSettings settings(UI_ELEMENTS_INI_FILE,QSettings::IniFormat);
     settings.setValue("audio_mic_device", arg1 );
     uiElement.audioMixerInputDevice = arg1;
 }
+
+bool MainWindow::checkSshProcess()
+{
+    QString sshdBinary("/sbin/sshd");
+    QFile fileCheck(sshdBinary);
+    if ( fileCheck.exists() )
+        return true;
+    else
+        return false;
+}
+
 

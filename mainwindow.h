@@ -155,6 +155,7 @@ private slots:
     void staRedLedOff();
     void staGreenLedOn();
     void staGreenLedOff();
+    bool checkSshProcess();
 
 private:
     Ui::MainWindow *ui;
