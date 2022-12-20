@@ -1880,7 +1880,11 @@ void MainWindow::networkLatency()
     /* Keep screen on while connected */
     if ( g_connectState ) {
         screenBlanktimer->start(BLACK_OUT_TIME);
+        usrLedOn();
     }
+    if ( !g_connectState )
+        usrLedOff();
+
 }
 
 /* Read dpinger service output file for peers */
@@ -2397,7 +2401,6 @@ void MainWindow::on_imageFrameCloseButton_clicked()
 
 void MainWindow::on_imageFrameTakePictureButton_clicked()
 {
-    qint64 pid;
     QProcess process;
     process.setProgram("/bin/takepicture.sh");
     process.setArguments({""});
@@ -2411,7 +2414,6 @@ void MainWindow::on_imageFrameTakePictureButton_clicked()
         if (g_connectState)
             ui->imageFrameSendPicture->setVisible(1);
     }
-
 }
 
 void MainWindow::on_imageFrameSendPicture_clicked()
