@@ -157,6 +157,8 @@ private slots:
     void staGreenLedOff();
     bool checkSshProcess();
 
+    void on_myCallSignButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QFileSystemWatcher * watcher;
@@ -193,6 +195,7 @@ private:
         QString m_settingsPinCode;
         QString m_autoerase;
         QString m_micVolume;
+        QString m_extraSettingsPinCode;
     };
     UserPreferences uPref;
     void loadUserPreferences();
@@ -241,7 +244,6 @@ private:
     QString m_keyStatusString[NODECOUNT];
     QString m_peerLatencyValue[NODECOUNT];
     bool    m_f1WasDown=false;
-
 
     /* Button Styles */
     QString s_goSecureButtonStyle_highlight = "QPushButton#greenButton { \

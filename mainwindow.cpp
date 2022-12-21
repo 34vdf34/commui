@@ -96,6 +96,7 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
     ui->imageFrame->setVisible(0);
     ui->pinButton_pwr->setVisible(false);
     ui->pwrButton->setVisible(false);
+    ui->myCallSignButton->setVisible(false);
 
     /* Load user provided logo if it's present */
     QString logoGraphFile("/root/logo.png");
@@ -108,7 +109,7 @@ MainWindow::MainWindow(int argumentValue, QWidget *parent)
     if ( checkSshProcess() ) {
         sshStatus = "[development]";
     }
-    ui->versionLabel->setText("v0.33 (10) " + sshStatus);
+    ui->versionLabel->setText("v0.35 (10) " + sshStatus);
 
     if ( argumentValue == VAULT_MODE ) {
         m_startMode = VAULT_MODE;
@@ -1102,6 +1103,7 @@ void MainWindow::loadUserPreferences()
     nodes.beepActive = settings.value("beep").toString();
     uPref.m_pinCode = settings.value("pincode","1234").toString();
     uPref.m_settingsPinCode = settings.value("settings_pincode","4321").toString();
+    uPref.m_extraSettingsPinCode = settings.value("extra_settings_pincode","4322").toString();
     uPref.m_autoerase = settings.value("autoerase","true").toString();
     if ( uPref.m_autoerase == "true") {
         ui->autoeraseCheckbox->setChecked(true);
@@ -1512,6 +1514,7 @@ void MainWindow::on_pinButton_b_clicked()
 int MainWindow::on_pinButton_c_clicked()
 {
     if ( m_startMode == UI_MODE ) {
+        /* Normal settings */
         if ( ui->codeValue->text() == uPref.m_settingsPinCode ) {
             /* Get connection gateway IP and PORT to settings page */
             QSettings connectionSettings(WG_CONFIGURATION_FILE,QSettings::IniFormat);
@@ -1519,10 +1522,54 @@ int MainWindow::on_pinButton_c_clicked()
             ui->gatewayIpPortInput->setText(connectionIp);
             ui->saveGatewayButton->setStyleSheet(m_buttonNormalStyle);
             ui->saveGatewayButton->setEnabled(false);
+            /* Hide experimental settings */
+            ui->micVolButton->setVisible(false);
+            ui->audioDeviceInput->setVisible(false);
+            ui->audioDeviceMicInputName->setVisible(false);
+            ui->generalSettingsLabelAudio->setVisible(false);
+            ui->generalSettingsLabelMicAudio->setVisible(false);
+            ui->route1Button->setVisible(false);
+            ui->route2Button->setVisible(false);
+            ui->route3Button->setVisible(false);
+            ui->route1Selected->setVisible(false);
+            ui->route2Selected->setVisible(false);
+            ui->route3Selected->setVisible(false);
+            ui->routeTitle->setVisible(false);
+            ui->myCallSignButton->setVisible(false);
+            /* */
             ui->settingsFrame->setVisible(true);
             ui->logoLabel->setVisible(false);
             return 0;
         }
+        /* Extra settings */
+        if ( ui->codeValue->text() == uPref.m_extraSettingsPinCode ) {
+            /* Get connection gateway IP and PORT to settings page */
+            QSettings connectionSettings(WG_CONFIGURATION_FILE,QSettings::IniFormat);
+            QString connectionIp = connectionSettings.value("WireGuardPeer/Endpoint").toString();
+            ui->gatewayIpPortInput->setText(connectionIp);
+            ui->saveGatewayButton->setStyleSheet(m_buttonNormalStyle);
+            ui->saveGatewayButton->setEnabled(false);
+            /* Experimentals: visible */
+            ui->micVolButton->setVisible(true);
+            ui->audioDeviceInput->setVisible(true);
+            ui->audioDeviceMicInputName->setVisible(true);
+            ui->generalSettingsLabelAudio->setVisible(true);
+            ui->generalSettingsLabelMicAudio->setVisible(true);
+            ui->route1Button->setVisible(true);
+            ui->route2Button->setVisible(true);
+            ui->route3Button->setVisible(true);
+            ui->route1Selected->setVisible(true);
+            ui->route2Selected->setVisible(false);
+            ui->route3Selected->setVisible(false);
+            ui->routeTitle->setVisible(true);
+            ui->myCallSignButton->setVisible(true);
+            /* */
+            ui->settingsFrame->setVisible(true);
+            ui->logoLabel->setVisible(false);
+            return 0;
+        }
+
+
         if ( ui->codeValue->text() == uPref.m_pinCode ) {
              ui->codeFrame->setVisible(false);
              beepBuzzer(20);
@@ -2508,4 +2555,20 @@ bool MainWindow::checkSshProcess()
         return false;
 }
 
+
+/* This is still work in progress. Callsign changing is catch 22. */
+void MainWindow::on_myCallSignButton_clicked()
+{
+    QInputDialog inputBox;
+    inputBox.setLabelText("Change your call sign:");
+    inputBox.setStyleSheet( m_editCallSignStyle );
+    inputBox.setTextValue(nodes.myNodeName);
+    int ret = inputBox.exec();
+    if ( ret == QDialog::Accepted ) {
+        QString myNewCallsign = inputBox.textValue();
+        if ( myNewCallsign.length() > 3 &&  myNewCallsign.length() < 8 ) {
+         ui->WifistatusLabel->setText("Unsupported feature.");
+        }
+    }
+}
 
