@@ -296,7 +296,6 @@ void MainWindow::readGpioButtons()
                 ui->contact8Button->setText( m_keyStatusString[7] );
                 ui->contact9Button->setText( m_keyStatusString[8] );
                 ui->contact10Button->setText( m_keyStatusString[9] );
-
                 ui->contact1Button->setStyleSheet(m_otpStatusHighlightStyle);
                 ui->contact2Button->setStyleSheet(m_otpStatusHighlightStyle);
                 ui->contact3Button->setStyleSheet(m_otpStatusHighlightStyle);
@@ -965,8 +964,6 @@ void MainWindow::loadSettings()
     ui->contact4Button->setText( nodes.node_name[3] );
     ui->contact5Button->setText( nodes.node_name[4] );
     ui->contact6Button->setText( nodes.node_name[5] );
-
-    /* TODO THIS After INI files are formed right: */
     ui->contact7Button->setText( nodes.node_name[6] );
     ui->contact8Button->setText( nodes.node_name[7] );
     ui->contact9Button->setText( nodes.node_name[8] );
@@ -1104,15 +1101,7 @@ void MainWindow::loadUserPreferences()
     uPref.m_pinCode = settings.value("pincode","1234").toString();
     uPref.m_settingsPinCode = settings.value("settings_pincode","4321").toString();
     uPref.m_extraSettingsPinCode = settings.value("extra_settings_pincode","4322").toString();
-    uPref.m_autoerase = settings.value("autoerase","true").toString();
-    if ( uPref.m_autoerase == "true") {
-        ui->autoeraseCheckbox->setChecked(true);
-    }
-    if ( uPref.m_autoerase == "false") {
-        ui->autoeraseCheckbox->setChecked(false);
-    }
     uPref.m_micVolume = settings.value("micvolume","90").toString();
-
 }
 void MainWindow::saveUserPreferences()
 {
@@ -1145,8 +1134,39 @@ void MainWindow::loadUserInterfacePreferences()
     uiElement.pinEntryTitleVaultChecking = settings.value("pintitle_vault_check","Checking...").toString();
     uiElement.pinEntryTitleAccessPin = settings.value("pintitle_access","Set calibration data:").toString();
     uiElement.cameraButtonVisible = settings.value("cam_enabled",false).toBool();
+    uiElement.audioPreset_1_ButtonText = settings.value("audio_1_button","Generic HF").toString();
+    uiElement.audioPreset_1_SpkMixerName = settings.value("audio_1_spk","Headset").toString();
+    uiElement.audioPreset_1_MicMixerName = settings.value("audio_1_mic","Headset").toString();
+    ui->audioPresetButton1->setText(uiElement.audioPreset_1_ButtonText);
+    uiElement.audioPreset_2_ButtonText = settings.value("audio_2_button","Jabra SPK").toString();
+    uiElement.audioPreset_2_SpkMixerName = settings.value("audio_2_spk","PCM").toString();
+    uiElement.audioPreset_2_MicMixerName = settings.value("audio_2_mic","Headset").toString();
+    ui->audioPresetButton2->setText(uiElement.audioPreset_2_ButtonText);
+    uiElement.audioPreset_3_ButtonText = settings.value("audio_3_button","Jabra HF").toString();
+    uiElement.audioPreset_3_SpkMixerName = settings.value("audio_3_spk","Speaker").toString();
+    uiElement.audioPreset_3_MicMixerName = settings.value("audio_3_mic","Microphone").toString();
+    ui->audioPresetButton3->setText(uiElement.audioPreset_3_ButtonText);
+    uiElement.audioPreset_4_ButtonText = settings.value("audio_4_button","Juno SPK").toString();
+    uiElement.audioPreset_4_SpkMixerName = settings.value("audio_4_spk","PCM").toString();
+    uiElement.audioPreset_4_MicMixerName = settings.value("audio_4_mic","Mic").toString();
+    ui->audioPresetButton4->setText(uiElement.audioPreset_4_ButtonText);
+    uiElement.currentAudioPreset = settings.value("current_audio_preset",1).toInt();
+
+    if ( uiElement.currentAudioPreset == 1 )
+        on_audioPresetButton1_clicked();
+    if ( uiElement.currentAudioPreset == 2 )
+        on_audioPresetButton2_clicked();
+    if ( uiElement.currentAudioPreset == 3 )
+        on_audioPresetButton3_clicked();
+    if ( uiElement.currentAudioPreset == 4 )
+        on_audioPresetButton4_clicked();
+
+    ui->WifistatusLabel->setText("");
+    ui->WifistatusLabel->setStyleSheet(m_wifiConnectStatusNormalStyle);
+    // These are used in CMD:
     uiElement.audioMixerOutputDevice = settings.value("audio_device","Headset").toString();
     uiElement.audioMixerInputDevice = settings.value("audio_mic_device","Headset").toString();
+
     ui->systemNameLabel->setText(uiElement.systemName);
     ui->messagingTitle->setText(uiElement.messagingTitle);
     ui->commCheckButton->setText(uiElement.commCheckButton);
@@ -1154,8 +1174,6 @@ void MainWindow::loadUserInterfacePreferences()
     ui->greenButton->setText(uiElement.goSecureButton);
     ui->redButton->setText(uiElement.terminateSecureButton);
     ui->pinEntryTitle->setText(uiElement.pinEntryTitleAccessPin);
-    ui->audioDeviceInput->setText(uiElement.audioMixerOutputDevice);
-    ui->audioDeviceMicInputName->setText(uiElement.audioMixerInputDevice);
     if ( uiElement.cameraButtonVisible ) {
         ui->camButton->setVisible(1);
     } else {
@@ -1524,16 +1542,13 @@ int MainWindow::on_pinButton_c_clicked()
             ui->saveGatewayButton->setEnabled(false);
             /* Hide experimental settings */
             ui->micVolButton->setVisible(false);
-            ui->audioDeviceInput->setVisible(false);
-            ui->audioDeviceMicInputName->setVisible(false);
-            ui->generalSettingsLabelAudio->setVisible(false);
-            ui->generalSettingsLabelMicAudio->setVisible(false);
             ui->route1Button->setVisible(false);
             ui->route2Button->setVisible(false);
             ui->route3Button->setVisible(false);
             ui->route1Selected->setVisible(false);
             ui->route2Selected->setVisible(false);
             ui->route3Selected->setVisible(false);
+            ui->networkingInformationLabel->setVisible(false);
             ui->routeTitle->setVisible(false);
             ui->myCallSignButton->setVisible(false);
             /* */
@@ -1551,16 +1566,13 @@ int MainWindow::on_pinButton_c_clicked()
             ui->saveGatewayButton->setEnabled(false);
             /* Experimentals: visible */
             ui->micVolButton->setVisible(true);
-            ui->audioDeviceInput->setVisible(true);
-            ui->audioDeviceMicInputName->setVisible(true);
-            ui->generalSettingsLabelAudio->setVisible(true);
-            ui->generalSettingsLabelMicAudio->setVisible(true);
             ui->route1Button->setVisible(true);
             ui->route2Button->setVisible(true);
             ui->route3Button->setVisible(true);
             ui->route1Selected->setVisible(true);
             ui->route2Selected->setVisible(false);
             ui->route3Selected->setVisible(false);
+            ui->networkingInformationLabel->setVisible(true);
             ui->routeTitle->setVisible(true);
             ui->myCallSignButton->setVisible(true);
             /* */
@@ -1568,8 +1580,6 @@ int MainWindow::on_pinButton_c_clicked()
             ui->logoLabel->setVisible(false);
             return 0;
         }
-
-
         if ( ui->codeValue->text() == uPref.m_pinCode ) {
              ui->codeFrame->setVisible(false);
              beepBuzzer(20);
@@ -2397,18 +2407,6 @@ void MainWindow::on_gatewayIpPortInput_textChanged(const QString &arg1)
     }
 }
 
-void MainWindow::on_autoeraseCheckbox_stateChanged(int arg1)
-{
-    if ( arg1 == 2 ) {
-        uPref.m_autoerase = "true";
-    }
-    if ( arg1 == 0 ) {
-        uPref.m_autoerase = "false";
-    }
-    QSettings settings(USER_PREF_INI_FILE,QSettings::IniFormat);
-    settings.setValue("autoerase", uPref.m_autoerase);
-}
-
 void MainWindow::finalCountdown()
 {
     if ( m_finalCountdownValue >= 0 ) {
@@ -2512,13 +2510,6 @@ void MainWindow::incomingImageVerifyChange()
 
 }
 
-void MainWindow::on_audioDeviceInput_textChanged(const QString &arg1)
-{
-    QSettings settings(UI_ELEMENTS_INI_FILE,QSettings::IniFormat);
-    settings.setValue("audio_device", arg1 );
-    uiElement.audioMixerOutputDevice = arg1;
-}
-
 void MainWindow::on_micVolButton_clicked()
 {
     QInputDialog inputBox;
@@ -2538,13 +2529,6 @@ void MainWindow::on_micVolButton_clicked()
     }
 }
 
-void MainWindow::on_audioDeviceMicInputName_textChanged(const QString &arg1)
-{
-    QSettings settings(UI_ELEMENTS_INI_FILE,QSettings::IniFormat);
-    settings.setValue("audio_mic_device", arg1 );
-    uiElement.audioMixerInputDevice = arg1;
-}
-
 bool MainWindow::checkSshProcess()
 {
     QString sshdBinary("/sbin/sshd");
@@ -2554,7 +2538,6 @@ bool MainWindow::checkSshProcess()
     else
         return false;
 }
-
 
 /* This is still work in progress. Callsign changing is catch 22. */
 void MainWindow::on_myCallSignButton_clicked()
@@ -2570,5 +2553,68 @@ void MainWindow::on_myCallSignButton_clicked()
          ui->WifistatusLabel->setText("Unsupported feature.");
         }
     }
+}
+
+/* Audio device preset logic */
+void MainWindow::on_audioPresetButton1_clicked()
+{
+    uiElement.audioMixerOutputDevice = uiElement.audioPreset_1_SpkMixerName;
+    uiElement.audioMixerInputDevice = uiElement.audioPreset_1_MicMixerName;
+    QSettings settings(UI_ELEMENTS_INI_FILE,QSettings::IniFormat);
+    settings.setValue("current_audio_preset", 1 );
+    ui->audioPresetButton1->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: lightgreen;");
+    ui->audioPresetButton2->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    ui->audioPresetButton3->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    ui->audioPresetButton4->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    saveUserPreferences();
+    ui->WifistatusLabel->setText("Audio preset activated: " + uiElement.audioMixerOutputDevice + " " + uiElement.audioMixerInputDevice );
+    ui->WifistatusLabel->setStyleSheet(m_wifiConnectStatusHighlightStyle);
+}
+
+void MainWindow::on_audioPresetButton2_clicked()
+{
+    uiElement.audioMixerOutputDevice = uiElement.audioPreset_2_SpkMixerName;
+    uiElement.audioMixerInputDevice = uiElement.audioPreset_2_MicMixerName;
+    QSettings settings(UI_ELEMENTS_INI_FILE,QSettings::IniFormat);
+    settings.setValue("current_audio_preset", 2 );
+    ui->audioPresetButton1->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    ui->audioPresetButton2->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: lightgreen;");
+    ui->audioPresetButton3->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    ui->audioPresetButton4->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    saveUserPreferences();
+    ui->WifistatusLabel->setText("Audio preset activated: " + uiElement.audioMixerOutputDevice + " " + uiElement.audioMixerInputDevice );
+    ui->WifistatusLabel->setStyleSheet(m_wifiConnectStatusHighlightStyle);
+}
+
+
+void MainWindow::on_audioPresetButton3_clicked()
+{
+    uiElement.audioMixerOutputDevice = uiElement.audioPreset_3_SpkMixerName;
+    uiElement.audioMixerInputDevice = uiElement.audioPreset_3_MicMixerName;
+    QSettings settings(UI_ELEMENTS_INI_FILE,QSettings::IniFormat);
+    settings.setValue("current_audio_preset", 3 );
+    ui->audioPresetButton1->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    ui->audioPresetButton2->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    ui->audioPresetButton3->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: lightgreen;");
+    ui->audioPresetButton4->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    saveUserPreferences();
+    ui->WifistatusLabel->setText("Audio preset activated: " + uiElement.audioMixerOutputDevice + " " + uiElement.audioMixerInputDevice );
+    ui->WifistatusLabel->setStyleSheet(m_wifiConnectStatusHighlightStyle);
+}
+
+
+void MainWindow::on_audioPresetButton4_clicked()
+{
+    uiElement.audioMixerOutputDevice = uiElement.audioPreset_4_SpkMixerName;
+    uiElement.audioMixerInputDevice = uiElement.audioPreset_4_MicMixerName;
+    QSettings settings(UI_ELEMENTS_INI_FILE,QSettings::IniFormat);
+    settings.setValue("current_audio_preset", 4 );
+    ui->audioPresetButton1->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    ui->audioPresetButton2->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    ui->audioPresetButton3->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: green;");
+    ui->audioPresetButton4->setStyleSheet("border-color: green; border-width: 2px; border-style: outset; color: lightgreen;");
+    saveUserPreferences();
+    ui->WifistatusLabel->setText("Audio preset activated: " + uiElement.audioMixerOutputDevice + " " + uiElement.audioMixerInputDevice );
+    ui->WifistatusLabel->setStyleSheet(m_wifiConnectStatusHighlightStyle);
 }
 

@@ -128,7 +128,7 @@ private slots:
     void on_saveGatewayButton_clicked();
     int isValidIp4(char *str);
     void on_gatewayIpPortInput_textChanged(const QString &arg1);
-    void on_autoeraseCheckbox_stateChanged(int arg1);
+    // void on_autoeraseCheckbox_stateChanged(int arg1);
     void finalCountdown();
     void onVaultProcessReadyReadStdOutput();
     void onVaultProcessFinished();
@@ -143,12 +143,12 @@ private slots:
     void tearDownLocal();
     int waitForFifoReply();
     int checkFifoReplyTimeout();
-    void on_audioDeviceInput_textChanged(const QString &arg1);
     void resetF1State();
     void changeCallSign(int index);
     void on_micVolButton_clicked();
     void setMicrophoneVolume(int volume);
-    void on_audioDeviceMicInputName_textChanged(const QString &arg1);
+    // void on_audioDeviceInput_textChanged(const QString &arg1);
+    // void on_audioDeviceMicInputName_textChanged(const QString &arg1);
     void usrLedOn();
     void usrLedOff();
     void staRedLedOn();
@@ -158,6 +158,14 @@ private slots:
     bool checkSshProcess();
 
     void on_myCallSignButton_clicked();
+
+    void on_audioPresetButton1_clicked();
+
+    void on_audioPresetButton2_clicked();
+
+    void on_audioPresetButton3_clicked();
+
+    void on_audioPresetButton4_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -220,8 +228,25 @@ private:
         QString pinEntryTitleVaultChecking;
         QString pinEntryTitleAccessPin;
         bool cameraButtonVisible;
+
+        QString audioPreset_1_ButtonText;
+        QString audioPreset_1_SpkMixerName;
+        QString audioPreset_1_MicMixerName;
+        QString audioPreset_2_ButtonText;
+        QString audioPreset_2_SpkMixerName;
+        QString audioPreset_2_MicMixerName;
+        QString audioPreset_3_ButtonText;
+        QString audioPreset_3_SpkMixerName;
+        QString audioPreset_3_MicMixerName;
+        QString audioPreset_4_ButtonText;
+        QString audioPreset_4_SpkMixerName;
+        QString audioPreset_4_MicMixerName;
+
         QString audioMixerOutputDevice;
         QString audioMixerInputDevice;
+
+        int currentAudioPreset=0;
+
     };
     uiStrings uiElement;
     void loadUserInterfacePreferences();

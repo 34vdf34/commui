@@ -2027,40 +2027,11 @@ QPushButton:pressed {
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
       </property>
      </widget>
-     <widget class="QCheckBox" name="autoeraseCheckbox">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>230</y>
-        <width>611</width>
-        <height>71</height>
-       </rect>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QCheckBox {
-    spacing: 5px;
-    font-size:30px;     
-	spacing:20px;
- border:none;
-}
-
-QCheckBox::indicator {
-    width:  35px;
-    height: 35px;
-}</string>
-      </property>
-      <property name="text">
-       <string>Msg auto erase</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="generalSettingsLabel">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>180</y>
+        <y>165</y>
         <width>301</width>
         <height>41</height>
        </rect>
@@ -2074,7 +2045,7 @@ QCheckBox::indicator {
 </string>
       </property>
       <property name="text">
-       <string>General settings:</string>
+       <string>Audio device:</string>
       </property>
      </widget>
      <widget class="QPushButton" name="exitButton">
@@ -2127,7 +2098,7 @@ QPushButton:pressed {
       <property name="geometry">
        <rect>
         <x>660</x>
-        <y>180</y>
+        <y>165</y>
         <width>551</width>
         <height>41</height>
        </rect>
@@ -2148,7 +2119,7 @@ QPushButton:pressed {
       <property name="geometry">
        <rect>
         <x>680</x>
-        <y>240</y>
+        <y>220</y>
         <width>371</width>
         <height>61</height>
        </rect>
@@ -2177,7 +2148,7 @@ font:   30px;</string>
       <property name="geometry">
        <rect>
         <x>1080</x>
-        <y>240</y>
+        <y>220</y>
         <width>171</width>
         <height>61</height>
        </rect>
@@ -2223,7 +2194,7 @@ QPushButton:pressed {
       <property name="geometry">
        <rect>
         <x>660</x>
-        <y>320</y>
+        <y>300</y>
         <width>461</width>
         <height>41</height>
        </rect>
@@ -2237,7 +2208,7 @@ QPushButton:pressed {
 </string>
       </property>
       <property name="text">
-       <string>Networking information:</string>
+       <string>Network mode:</string>
       </property>
      </widget>
      <widget class="QLabel" name="networkingInformationData">
@@ -2245,8 +2216,8 @@ QPushButton:pressed {
        <rect>
         <x>680</x>
         <y>370</y>
-        <width>541</width>
-        <height>150</height>
+        <width>371</width>
+        <height>201</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -2267,10 +2238,10 @@ QPushButton:pressed {
      <widget class="Line" name="separatorLine1">
       <property name="geometry">
        <rect>
-        <x>650</x>
-        <y>160</y>
+        <x>655</x>
+        <y>150</y>
         <width>2</width>
-        <height>430</height>
+        <height>440</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -2287,7 +2258,7 @@ QPushButton:pressed {
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>160</y>
+        <y>150</y>
         <width>1281</width>
         <height>2</height>
        </rect>
@@ -2344,62 +2315,12 @@ font:   30px;</string>
        <string/>
       </property>
      </widget>
-     <widget class="QLineEdit" name="audioDeviceInput">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>360</y>
-        <width>180</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background: rgba(0, 0, 0,200);
-border-style: outset;
-border-width: 2px;
-border-radius: 2px;
-border-color: green;
-color: lightgreen;
-padding: 5px;
-font:   30px;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="maxLength">
-       <number>190</number>
-      </property>
-      <property name="placeholderText">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="generalSettingsLabelAudio">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>300</y>
-        <width>180</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">    background-color: transparent;
-   color: green;
-    font:   32px;
-    min-width: 1em;
-    padding: 3px;
-</string>
-      </property>
-      <property name="text">
-       <string>SPK Mixer</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="route1Selected">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>550</y>
-        <width>121</width>
+        <x>1080</x>
+        <y>370</y>
+        <width>170</width>
         <height>15</height>
        </rect>
       </property>
@@ -2424,9 +2345,9 @@ font:   30px;</string>
      <widget class="QPushButton" name="route2Button">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>480</y>
-        <width>121</width>
+        <x>1080</x>
+        <y>400</y>
+        <width>170</width>
         <height>61</height>
        </rect>
       </property>
@@ -2466,9 +2387,9 @@ QPushButton#route2Button:pressed {
      <widget class="QLabel" name="route2Selected">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>550</y>
-        <width>121</width>
+        <x>1080</x>
+        <y>470</y>
+        <width>170</width>
         <height>15</height>
        </rect>
       </property>
@@ -2493,9 +2414,9 @@ QPushButton#route2Button:pressed {
      <widget class="QPushButton" name="route3Button">
       <property name="geometry">
        <rect>
-        <x>290</x>
-        <y>480</y>
-        <width>121</width>
+        <x>1080</x>
+        <y>500</y>
+        <width>170</width>
         <height>61</height>
        </rect>
       </property>
@@ -2535,9 +2456,9 @@ QPushButton#route3Button:pressed {
      <widget class="QPushButton" name="route1Button">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>480</y>
-        <width>121</width>
+        <x>1080</x>
+        <y>300</y>
+        <width>170</width>
         <height>61</height>
        </rect>
       </property>
@@ -2585,9 +2506,9 @@ QPushButton#route1Button:checkked {
      <widget class="QLabel" name="route3Selected">
       <property name="geometry">
        <rect>
-        <x>290</x>
-        <y>550</y>
-        <width>121</width>
+        <x>1080</x>
+        <y>570</y>
+        <width>170</width>
         <height>15</height>
        </rect>
       </property>
@@ -2627,7 +2548,7 @@ QPushButton#route1Button:checkked {
 </string>
       </property>
       <property name="text">
-       <string>Network mode:</string>
+       <string/>
       </property>
       <property name="pixmap">
        <pixmap>:/new/prefix1/globe-no.png</pixmap>
@@ -2639,9 +2560,9 @@ QPushButton#route1Button:checkked {
      <widget class="QPushButton" name="micVolButton">
       <property name="geometry">
        <rect>
-        <x>420</x>
-        <y>360</y>
-        <width>210</width>
+        <x>450</x>
+        <y>310</y>
+        <width>190</width>
         <height>61</height>
        </rect>
       </property>
@@ -2678,62 +2599,12 @@ QPushButton:pressed {
        <string>Mic level</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="audioDeviceMicInputName">
-      <property name="geometry">
-       <rect>
-        <x>220</x>
-        <y>360</y>
-        <width>180</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background: rgba(0, 0, 0,200);
-border-style: outset;
-border-width: 2px;
-border-radius: 2px;
-border-color: green;
-color: lightgreen;
-padding: 5px;
-font:   30px;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="maxLength">
-       <number>190</number>
-      </property>
-      <property name="placeholderText">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="generalSettingsLabelMicAudio">
-      <property name="geometry">
-       <rect>
-        <x>200</x>
-        <y>300</y>
-        <width>180</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">    background-color: transparent;
-   color: green;
-    font:   32px;
-    min-width: 1em;
-    padding: 3px;
-</string>
-      </property>
-      <property name="text">
-       <string>MIC Mixer</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="myCallSignButton">
       <property name="geometry">
        <rect>
-        <x>420</x>
-        <y>240</y>
-        <width>210</width>
+        <x>450</x>
+        <y>230</y>
+        <width>190</width>
         <height>61</height>
        </rect>
       </property>
@@ -2768,6 +2639,174 @@ QPushButton:pressed {
       </property>
       <property name="text">
        <string>Callsign</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="audioPresetButton1">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>230</y>
+        <width>190</width>
+        <height>60</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>DejaVu Sans Mono</family>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background-color: transparent;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: green;
+   color: green;
+    font:  28px;
+    min-width: 1em;
+    padding: 6px;
+}
+QPushButton:pressed {
+    background-color: rgb(0,224, 0);
+    border-style: inset;
+}</string>
+      </property>
+      <property name="text">
+       <string>Generic HF</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="audioPresetButton2">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>230</y>
+        <width>190</width>
+        <height>60</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>DejaVu Sans Mono</family>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background-color: transparent;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: green;
+   color: green;
+    font:  28px;
+    min-width: 1em;
+    padding: 6px;
+}
+QPushButton:pressed {
+    background-color: rgb(0,224, 0);
+    border-style: inset;
+}</string>
+      </property>
+      <property name="text">
+       <string>Jabra SPK</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="audioPresetButton3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>310</y>
+        <width>190</width>
+        <height>60</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>DejaVu Sans Mono</family>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background-color: transparent;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: green;
+   color: green;
+    font:  28px;
+    min-width: 1em;
+    padding: 6px;
+}
+QPushButton:pressed {
+    background-color: rgb(0,224, 0);
+    border-style: inset;
+}</string>
+      </property>
+      <property name="text">
+       <string>Jabra HF</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="audioPresetButton4">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>310</y>
+        <width>190</width>
+        <height>60</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>DejaVu Sans Mono</family>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+    background-color: transparent;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: green;
+   color: green;
+    font:  28px;
+    min-width: 1em;
+    padding: 6px;
+}
+QPushButton:pressed {
+    background-color: rgb(0,224, 0);
+    border-style: inset;
+}</string>
+      </property>
+      <property name="text">
+       <string>Juno SPK</string>
       </property>
      </widget>
     </widget>
